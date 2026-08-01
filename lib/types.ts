@@ -51,6 +51,8 @@ export interface Bid {
   amount: number;
   potential_win: number;
   status: string;
+  session?: string | null;
+  bid_date?: string | null;
   placed_at: string;
 }
 

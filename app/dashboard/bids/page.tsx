@@ -78,6 +78,8 @@ export default function BidsPage() {
                   <th>ID</th>
                   <th>User</th>
                   <th>Market</th>
+                  <th>Session</th>
+                  <th>Bid Date</th>
                   <th>Type</th>
                   <th>Number</th>
                   <th>Amount</th>
@@ -92,6 +94,8 @@ export default function BidsPage() {
                     <td className="py-3 text-slate-500">{b.id}</td>
                     <td className="font-medium text-slate-100">{b.username || b.user_id}</td>
                     <td>{b.market_name}</td>
+                    <td>{b.session || "-"}</td>
+                    <td>{b.bid_date || "-"}</td>
                     <td className="text-slate-400">{b.bet_type}</td>
                     <td>{b.selected_number}</td>
                     <td>{Number(b.amount).toFixed(2)}</td>

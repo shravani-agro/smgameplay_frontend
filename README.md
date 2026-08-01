@@ -72,7 +72,7 @@ Open http://localhost:3000 (or the port printed) and sign in.
 The backend uses **MySQL** by default via the `DATABASE_URL` in `../backend/.env`:
 
 ```
-DATABASE_URL=mysql+aiomysql://satta:satta123@localhost:3306/satta
+DATABASE_URL=mysql+aiomysql://satta:Gameplay1234@localhost:3306/satta
 ```
 
 To set up from scratch:
@@ -80,7 +80,7 @@ To set up from scratch:
 1. Create the database and user in MySQL:
    ```sql
    CREATE DATABASE satta CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   CREATE USER 'satta'@'localhost' IDENTIFIED BY 'satta123';
+   CREATE USER 'satta'@'localhost' IDENTIFIED BY 'Gameplay1234';
    GRANT ALL PRIVILEGES ON satta.* TO 'satta'@'localhost';
    ```
 2. Install the async driver (already in `requirements.txt`):

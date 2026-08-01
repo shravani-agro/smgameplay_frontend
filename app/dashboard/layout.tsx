@@ -15,6 +15,7 @@ const NAV = [
   { href: "/dashboard/bids", label: "Bids", icon: "🎲" },
   { href: "/dashboard/withdrawals", label: "Withdrawals", icon: "💸" },
   { href: "/dashboard/audit", label: "Audit Logs", icon: "🛡" },
+  { href: "/dashboard/settings", label: "Settings", icon: "⚙" },
 ];
 
 function NavContent({

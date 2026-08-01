@@ -27,6 +27,7 @@ export default function ResultsPage() {
   const [marketId, setMarketId] = useState<number | null>(null);
   const [openResult, setOpenResult] = useState("");
   const [closeResult, setCloseResult] = useState("");
+  const [sessionLabel, setSessionLabel] = useState("");
   const [preview, setPreview] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [loadingResults, setLoadingResults] = useState(true);
@@ -83,9 +84,10 @@ export default function ResultsPage() {
     setError(null);
     setMsg(null);
     try {
-      const res = await bulkDeclareResults([
-        { market_id: marketId, open_result: openResult, close_result: closeResult || null },
-      ]);
+      const payload: any = { market_id: marketId, open_result: openResult };
+      if (closeResult) payload.close_result = closeResult;
+      if (sessionLabel) payload.session_label = sessionLabel;
+      const res = await bulkDeclareResults([payload]);
       const first = res.results?.[0];
       if (first?.status === "error") {
         setError(first.detail || "Failed to declare result");
@@ -94,6 +96,7 @@ export default function ResultsPage() {
         setMarketId(null);
         setOpenResult("");
         setCloseResult("");
+        setSessionLabel("");
         setPreview(null);
         loadResults();
       }
@@ -142,6 +145,11 @@ export default function ResultsPage() {
             placeholder="Close result (optional, e.g. 5-678)"
             value={closeResult}
             onChange={(e) => setCloseResult(e.target.value)}
+          />
+          <Input
+            placeholder="Session label (for Starline)"
+            value={sessionLabel}
+            onChange={(e) => setSessionLabel(e.target.value)}
           />
         </div>
         {selectedMarket && (
@@ -221,6 +229,7 @@ export default function ResultsPage() {
                   <th className="py-2.5">Market</th>
                   <th>Type</th>
                   <th>Status</th>
+                  <th>Session</th>
                   <th>Open Result</th>
                   <th>Close Result</th>
                   <th>Source</th>
@@ -233,6 +242,7 @@ export default function ResultsPage() {
                     <td className="py-3 text-slate-100">{r.market_name} <span className="text-slate-500">#{r.market_id}</span></td>
                     <td>{r.market_type}</td>
                     <td><Badge color={statusColor[r.market_status] || "slate"}>{r.market_status}</Badge></td>
+                    <td>{r.session_label || "—"}</td>
                     <td className="font-mono text-slate-200">{r.open_result || "—"}</td>
                     <td className="font-mono text-slate-200">{r.close_result || "—"}</td>
                     <td>

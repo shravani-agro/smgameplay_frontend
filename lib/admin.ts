@@ -183,3 +183,33 @@ export async function getAuditLogs(params: any = {}) {
   const res = await client.get("/admin/audit-logs", { params });
   return res.data;
 }
+
+/* ---------------- Admin: Settings ---------------- */
+
+export async function getSettings() {
+  const res = await client.get("/admin/settings");
+  return res.data;
+}
+
+export async function updateSetting(key: string, value: string, description?: string) {
+  const params: any = { value };
+  if (description !== undefined) params.description = description;
+  const res = await client.put(`/admin/settings/${key}`, null, { params });
+  return res.data;
+}
+
+/* ---------------- Admin: Notifications ---------------- */
+
+export async function broadcastNotification(title: string, message: string) {
+  const res = await client.post("/admin/notifications/broadcast", null, {
+    params: { title, message },
+  });
+  return res.data;
+}
+
+export async function sendUserNotification(userId: number, title: string, message: string) {
+  const res = await client.post("/admin/notifications/send", null, {
+    params: { user_id: userId, title, message },
+  });
+  return res.data;
+}
