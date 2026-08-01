@@ -7,15 +7,15 @@ import { useAuth } from "@/components/AuthProvider";
 import { Button, Spinner, cn } from "@/components/ui";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: "▦" },
-  { href: "/dashboard/users", label: "Users", icon: "👤" },
-  { href: "/dashboard/markets", label: "Markets", icon: "📈" },
-  { href: "/dashboard/results", label: "Results", icon: "🎯" },
-  { href: "/dashboard/deposits", label: "Deposits", icon: "➕" },
-  { href: "/dashboard/bids", label: "Bids", icon: "🎲" },
-  { href: "/dashboard/withdrawals", label: "Withdrawals", icon: "💸" },
-  { href: "/dashboard/audit", label: "Audit Logs", icon: "🛡" },
-  { href: "/dashboard/settings", label: "Settings", icon: "⚙" },
+  { href: "/admin", label: "Dashboard", icon: "▦" },
+  { href: "/admin/users", label: "Users", icon: "👤" },
+  { href: "/admin/markets", label: "Markets", icon: "📈" },
+  { href: "/admin/results", label: "Results", icon: "🎯" },
+  { href: "/admin/deposits", label: "Deposits", icon: "➕" },
+  { href: "/admin/bids", label: "Bids", icon: "🎲" },
+  { href: "/admin/withdrawals", label: "Withdrawals", icon: "💸" },
+  { href: "/admin/audit", label: "Audit Logs", icon: "🛡" },
+  { href: "/admin/settings", label: "Settings", icon: "⚙" },
 ];
 
 function NavContent({
@@ -29,8 +29,8 @@ function NavContent({
     <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
       {NAV.map((item) => {
         const active =
-          item.href === "/dashboard"
-            ? pathname === "/dashboard"
+          item.href === "/admin"
+            ? pathname === "/admin"
             : pathname.startsWith(item.href);
         return (
           <Link
@@ -164,7 +164,7 @@ export default function DashboardLayout({
             </div>
             <h1 className="text-sm font-semibold text-slate-200">
               {NAV.find((n) =>
-                n.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(n.href)
+                n.href === "/admin" ? pathname === "/admin" : pathname.startsWith(n.href)
               )?.label ?? "Dashboard"}
             </h1>
           </div>

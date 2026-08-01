@@ -64,7 +64,7 @@ export default function Hero() {
               Download App
             </a>
             <Link
-              href="/dashboard"
+              href="/admin"
               className="group flex items-center gap-2 text-sm font-semibold leading-6 text-white transition-colors hover:text-brand-300"
             >
               Admin Login <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

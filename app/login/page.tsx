@@ -23,7 +23,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(username, password);
-      router.replace("/dashboard");
+      router.replace("/admin");
     } catch (err: any) {
       const detail = err?.response?.data?.detail;
       setError(typeof detail === "string" ? detail : "Login failed. Check credentials.");
