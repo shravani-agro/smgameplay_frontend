@@ -11,12 +11,15 @@ import {
   Spinner,
   ErrorMsg,
   PageHeader,
+  Switch,
 } from "@/components/ui";
 import {
   listMarkets,
   softDeleteMarket,
   createMarket,
+  createMarket,
   updateMarket,
+  reorderMarkets,
 } from "@/lib/admin";
 
 export default function MarketsPage() {
@@ -25,12 +28,24 @@ export default function MarketsPage() {
   const [error, setError] = useState<string | null>(null);
   const [edit, setEdit] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
+  const [isReordering, setIsReordering] = useState(false);
+  const [orderChanged, setOrderChanged] = useState(false);
+  
+  const dragItem = React.useRef<number | null>(null);
+  const dragOverItem = React.useRef<number | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
     market_type: "regular",
+    game_days: "Mon-Sat",
     open_time: "",
     close_time: "",
+    open_start_time: "",
+    open_stop_time: "",
+    close_start_time: "",
+    close_stop_time: "",
+    sequence_number: 0,
+    holiday_status: false,
     schedules: [] as { result_time: string; session_label: string }[],
   });
 
@@ -38,7 +53,9 @@ export default function MarketsPage() {
     setLoading(true);
     setError(null);
     try {
-      setMarkets(await listMarkets({}));
+      const data = await listMarkets({});
+      setMarkets(data.sort((a: any, b: any) => (a.sequence_number || 0) - (b.sequence_number || 0)));
+      setOrderChanged(false);
     } catch (e: any) {
       setError(e?.response?.data?.detail || "Failed to load markets");
     } finally {
@@ -54,8 +71,15 @@ export default function MarketsPage() {
     setFormData({
       name: "",
       market_type: "regular",
+      game_days: "Mon-Sat",
       open_time: "",
       close_time: "",
+      open_start_time: "",
+      open_stop_time: "",
+      close_start_time: "",
+      close_stop_time: "",
+      sequence_number: 0,
+      holiday_status: false,
       schedules: [],
     });
     setEdit({ isNew: true });
@@ -65,8 +89,15 @@ export default function MarketsPage() {
     setFormData({
       name: m.name || "",
       market_type: m.market_type || "regular",
+      game_days: m.game_days || "Mon-Sat",
       open_time: m.open_time || "",
       close_time: m.close_time || "",
+      open_start_time: m.open_start_time || "",
+      open_stop_time: m.open_stop_time || "",
+      close_start_time: m.close_start_time || "",
+      close_stop_time: m.close_stop_time || "",
+      sequence_number: m.sequence_number || 0,
+      holiday_status: m.holiday_status || false,
       schedules: m.schedules || [],
     });
     setEdit(m);
@@ -78,8 +109,15 @@ export default function MarketsPage() {
       const payload: any = {
         name: formData.name,
         market_type: formData.market_type,
-        open_time: formData.open_time,
-        close_time: formData.close_time,
+        game_days: formData.game_days,
+        open_time: formData.open_time || null,
+        close_time: formData.close_time || null,
+        open_start_time: formData.open_start_time || null,
+        open_stop_time: formData.open_stop_time || null,
+        close_start_time: formData.close_start_time || null,
+        close_stop_time: formData.close_stop_time || null,
+        sequence_number: Number(formData.sequence_number),
+        holiday_status: formData.holiday_status,
       };
       if (formData.market_type === "starline") {
         payload.schedules = formData.schedules;
@@ -123,6 +161,50 @@ export default function MarketsPage() {
     setFormData({ ...formData, schedules: newSchedules });
   }
 
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    dragItem.current = index;
+  };
+
+  const handleDragEnter = (e: React.DragEvent, index: number) => {
+    dragOverItem.current = index;
+  };
+
+  const handleDragEnd = () => {
+    if (dragItem.current !== null && dragOverItem.current !== null && dragItem.current !== dragOverItem.current) {
+      const _markets = [...markets];
+      const draggedItemContent = _markets.splice(dragItem.current, 1)[0];
+      _markets.splice(dragOverItem.current, 0, draggedItemContent);
+      setMarkets(_markets);
+      setOrderChanged(true);
+    }
+    dragItem.current = null;
+    dragOverItem.current = null;
+  };
+
+  const saveOrder = async () => {
+    setIsReordering(true);
+    try {
+      const payload = markets.map((m, idx) => ({ id: m.id, sequence_number: idx + 1 }));
+      await reorderMarkets(payload);
+      setOrderChanged(false);
+      load();
+    } catch (err: any) {
+      alert("Failed to save reordered markets.");
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const toggleHoliday = async (market: any) => {
+    try {
+      const newStatus = !market.holiday_status;
+      await updateMarket(market.id, { holiday_status: newStatus });
+      setMarkets(markets.map(m => m.id === market.id ? { ...m, holiday_status: newStatus } : m));
+    } catch (err: any) {
+      alert("Failed to update holiday status");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -136,7 +218,17 @@ export default function MarketsPage() {
       />
       <ErrorMsg msg={error} />
 
-      <Card title={`${markets.length} markets`} bodyClassName="p-0">
+      <Card 
+        title={`${markets.length} markets`} 
+        bodyClassName="p-0"
+        actions={
+          orderChanged ? (
+            <Button size="sm" onClick={saveOrder} disabled={isReordering}>
+              {isReordering ? "Saving..." : "Save Order"}
+            </Button>
+          ) : null
+        }
+      >
         {loading ? (
           <div className="p-4"><Spinner /></div>
         ) : (
@@ -144,22 +236,43 @@ export default function MarketsPage() {
             <table className="w-full min-w-[760px] text-sm">
               <thead>
                 <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
-                  <th className="py-2.5">ID</th>
+                  <th className="py-2.5 w-8"></th>
+                  <th>ID</th>
                   <th>Name</th>
                   <th>Type</th>
+                  <th>Holiday</th>
                   <th>Open / Close</th>
                   <th className="text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {markets.map((m) => (
-                  <tr key={m.id} className="border-t border-white/5 hover:bg-white/[0.02]">
-                    <td className="py-3 text-slate-500">{m.id}</td>
-                    <td className="font-medium text-slate-100">{m.name}</td>
+                {markets.map((m, idx) => (
+                  <tr 
+                    key={m.id} 
+                    className="border-t border-white/5 hover:bg-white/[0.02] cursor-move"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, idx)}
+                    onDragEnter={(e) => handleDragEnter(e, idx)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
+                    <td className="py-3 text-slate-600 pl-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>
+                    </td>
+                    <td className="text-slate-500">{m.id}</td>
+                    <td className="font-medium text-slate-100">
+                      {m.name} {m.holiday_status && <Badge color="amber" className="ml-2">Holiday</Badge>}
+                    </td>
                     <td>
                       <Badge color={m.market_type === "starline" ? "violet" : "slate"}>
                         {m.market_type}
                       </Badge>
+                    </td>
+                    <td>
+                      <Switch 
+                        checked={!!m.holiday_status} 
+                        onChange={() => toggleHoliday(m)} 
+                      />
                     </td>
                     <td>
                       <div className="text-xs text-slate-400">
@@ -184,36 +297,75 @@ export default function MarketsPage() {
         {edit && (
           <div className="space-y-5 max-h-[80vh] overflow-y-auto pr-2">
             <form onSubmit={saveMarket} className="space-y-4">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-400">Name</label>
-                <Input required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Market Name" />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-400">Game Name</label>
+                  <Input required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Market Name" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-400">Game Days</label>
+                  <Input value={formData.game_days} onChange={(e) => setFormData({ ...formData, game_days: e.target.value })} placeholder="e.g. Mon-Sat" />
+                </div>
               </div>
+
               <div>
                 <label className="mb-1 block text-xs font-medium text-slate-400">Type</label>
                 <Select value={formData.market_type} onChange={(e) => setFormData({ ...formData, market_type: e.target.value })}>
                   <option value="regular">Regular</option>
-                  <option value="starline">Starline</option>
+                  <option value="starline">Starline (Multi-Result)</option>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-400">Open Time (HH:MM)</label>
-                  <Input required value={formData.open_time} onChange={(e) => setFormData({ ...formData, open_time: e.target.value })} placeholder="10:00" />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-400">Close Time (HH:MM)</label>
-                  <Input required value={formData.close_time} onChange={(e) => setFormData({ ...formData, close_time: e.target.value })} placeholder="12:00" />
-                </div>
-              </div>
+
+              {formData.market_type === "regular" && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-400">Open Time</label>
+                      <Input required value={formData.open_time} onChange={(e) => setFormData({ ...formData, open_time: e.target.value })} placeholder="--:--" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-400">Close Time</label>
+                      <Input required value={formData.close_time} onChange={(e) => setFormData({ ...formData, close_time: e.target.value })} placeholder="--:--" />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-400">Open Start Time</label>
+                      <Input value={formData.open_start_time} onChange={(e) => setFormData({ ...formData, open_start_time: e.target.value })} placeholder="--:--" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-400">Open Stop Time</label>
+                      <Input value={formData.open_stop_time} onChange={(e) => setFormData({ ...formData, open_stop_time: e.target.value })} placeholder="--:--" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-400">Close Start Time</label>
+                      <Input value={formData.close_start_time} onChange={(e) => setFormData({ ...formData, close_start_time: e.target.value })} placeholder="--:--" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-400">Close Stop Time</label>
+                      <Input value={formData.close_stop_time} onChange={(e) => setFormData({ ...formData, close_stop_time: e.target.value })} placeholder="--:--" />
+                    </div>
+                  </div>
+                </>
+              )}
 
               {formData.market_type === "starline" && (
-                <div className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-semibold text-slate-200">Schedules</div>
-                    <Button size="sm" type="button" onClick={addSchedule}>+ Add Schedule</Button>
+                <div className="space-y-3 rounded-lg border border-violet-500/20 bg-violet-500/5 p-4">
+                  <div className="text-sm font-medium text-violet-300">
+                    Multi-result markets don't have Open/Close times like regular markets.
+                    Instead, they have multiple Time Slots (e.g. 11:00 AM, 11:15 AM) where results are declared.
+                  </div>
+                  
+                  <div className="mt-4 flex items-center justify-between">
+                    <div className="text-sm font-semibold text-slate-200">Time Slots</div>
+                    <Button size="sm" type="button" onClick={addSchedule}>+ Add Slot</Button>
                   </div>
                   {formData.schedules.length === 0 && (
-                    <div className="text-xs text-slate-400 italic">No schedules added.</div>
+                    <div className="text-xs text-slate-400 italic">No time slots added. You can add them now or later.</div>
                   )}
                   {formData.schedules.map((sch, i) => (
                     <div key={i} className="flex items-center gap-2">
@@ -227,7 +379,32 @@ export default function MarketsPage() {
                 </div>
               )}
 
-              <Button type="submit" className="w-full">Save Market</Button>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-400">Sequence Number</label>
+                  <Input type="number" value={formData.sequence_number} onChange={(e) => setFormData({ ...formData, sequence_number: parseInt(e.target.value) || 0 })} placeholder="0" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-400">Holiday Status</label>
+                  <div className="flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3">
+                     <span className="text-sm text-slate-300">{formData.holiday_status ? 'Active Holiday' : 'Normal'}</span>
+                     <div className="ml-auto">
+                        <Button 
+                           type="button"
+                           size="sm"
+                           variant={formData.holiday_status ? "danger" : "outline"} 
+                           onClick={() => setFormData({ ...formData, holiday_status: !formData.holiday_status })}
+                        >
+                           {formData.holiday_status ? 'Turn Off' : 'Turn On'}
+                        </Button>
+                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Button type="submit" className="w-full">Save Market</Button>
+              </div>
             </form>
           </div>
         )}

@@ -122,6 +122,11 @@ export async function updateMarket(marketId: number, data: any) {
   return res.data;
 }
 
+export async function reorderMarkets(markets: { id: number; sequence_number: number }[]) {
+  const res = await client.post("/admin/markets/reorder", { markets });
+  return res.data;
+}
+
 /* ---------------- Admin: Results ---------------- */
 
 export async function listResults(params: any = {}) {

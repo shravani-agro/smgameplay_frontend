@@ -25,6 +25,7 @@ export default function ResultsPage() {
   const [markets, setMarkets] = useState<any[]>([]);
   const [declaredResults, setDeclaredResults] = useState<any[]>([]);
   const [marketId, setMarketId] = useState<number | null>(null);
+  const [resultDate, setResultDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [openResult, setOpenResult] = useState("");
   const [closeResult, setCloseResult] = useState("");
   const [sessionLabel, setSessionLabel] = useState("");
@@ -85,6 +86,7 @@ export default function ResultsPage() {
     setMsg(null);
     try {
       const payload: any = { market_id: marketId, open_result: openResult };
+      if (resultDate) payload.result_date = resultDate;
       if (closeResult) payload.close_result = closeResult;
       if (sessionLabel) payload.session_label = sessionLabel;
       const res = await bulkDeclareResults([payload]);
@@ -123,46 +125,92 @@ export default function ResultsPage() {
       )}
       <ErrorMsg msg={error} />
 
-      <Card title="Declare Result" subtitle="Select any active market to declare or override result">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <Select
-            value={marketId ?? ""}
-            onChange={(e) => setMarketId(e.target.value ? Number(e.target.value) : null)}
-          >
-            <option value="">Select market</option>
-            {markets.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name} — {m.status} ({m.open_time?.slice(0, 5)}–{m.close_time?.slice(0, 5)})
-              </option>
-            ))}
-          </Select>
-          <Input
-            placeholder="Open result (e.g. 123-4)"
-            value={openResult}
-            onChange={(e) => setOpenResult(e.target.value)}
-          />
-          <Input
-            placeholder="Close result (optional, e.g. 5-678)"
-            value={closeResult}
-            onChange={(e) => setCloseResult(e.target.value)}
-          />
-          <Input
-            placeholder="Session label (for Starline)"
-            value={sessionLabel}
-            onChange={(e) => setSessionLabel(e.target.value)}
-          />
-        </div>
-        {selectedMarket && (
-          <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-400">
-            <span>Type: <span className="text-slate-200">{selectedMarket.market_type}</span></span>
-            <span>Open: <span className="text-slate-200">{selectedMarket.open_time?.slice(0, 5)}</span></span>
-            <span>Close: <span className="text-slate-200">{selectedMarket.close_time?.slice(0, 5)}</span></span>
-            <span>Status: <Badge color={statusColor[selectedMarket.status] || "slate"}>{selectedMarket.status}</Badge></span>
+      <Card title="Upload Result" subtitle="Select any active market to upload results">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-400">Market</label>
+            <Select
+              value={marketId ?? ""}
+              onChange={(e) => {
+                setMarketId(e.target.value ? Number(e.target.value) : null);
+                setSessionLabel("");
+                setOpenResult("");
+                setCloseResult("");
+              }}
+            >
+              <option value="">-- Select Market --</option>
+              {markets.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} — {m.market_type === "starline" ? "Starline" : "Regular"}
+                </option>
+              ))}
+            </Select>
           </div>
-        )}
+
+          {!selectedMarket || selectedMarket.market_type === "regular" ? (
+            <>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-400">Result Date</label>
+                <Input
+                  type="date"
+                  value={resultDate}
+                  onChange={(e) => setResultDate(e.target.value)}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="mb-1 block text-xs font-medium text-slate-400">Result Number</label>
+                <div className="flex gap-2">
+                   <Input
+                     placeholder="e.g. 123-45-678"
+                     value={openResult}
+                     onChange={(e) => {
+                       // Format automatically based on input length?
+                       setOpenResult(e.target.value);
+                     }}
+                     className="flex-1"
+                   />
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-400">Date</label>
+                <Input
+                  type="date"
+                  value={resultDate}
+                  onChange={(e) => setResultDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-400">Time Slot</label>
+                <Select
+                  value={sessionLabel}
+                  onChange={(e) => setSessionLabel(e.target.value)}
+                >
+                  <option value="">-- Select Slot --</option>
+                  {selectedMarket.schedules?.map((s: any) => (
+                    <option key={s.id || s.session_label} value={s.session_label}>
+                      {s.session_label} ({s.result_time?.slice(0, 5)})
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-400">Result Value</label>
+                <Input
+                  placeholder="e.g. 178-6"
+                  value={openResult}
+                  onChange={(e) => setOpenResult(e.target.value)}
+                />
+              </div>
+            </>
+          )}
+        </div>
+        
         <div className="mt-4 flex flex-wrap gap-2">
           <Button onClick={declare} disabled={!marketId || !openResult || loading}>
-            {loading ? "Processing..." : "Declare Result"}
+            {loading ? "Processing..." : "Upload Result"}
           </Button>
         </div>
       </Card>
@@ -214,8 +262,8 @@ export default function ResultsPage() {
       )}
 
       <Card
-        title="All Declared Results"
-        subtitle={`${declaredResults.length} result(s) — including scraper-imported`}
+        title="Recent Results"
+        subtitle="Manage and view all declared results"
       >
         {loadingResults ? (
           <Spinner />
@@ -223,38 +271,53 @@ export default function ResultsPage() {
           <EmptyState title="No results declared yet" />
         ) : (
           <div className="table-wrap">
+            <div className="mb-4 flex items-center justify-between text-sm text-slate-400">
+              <div className="flex items-center gap-2">
+                <span>Show</span>
+                <Select className="w-16 h-8 text-xs py-1 px-2">
+                   <option>10</option>
+                   <option>25</option>
+                   <option>50</option>
+                </Select>
+                <span>entries</span>
+              </div>
+              <div className="flex items-center gap-2">
+                 <span>Search:</span>
+                 <Input className="h-8 w-40 text-xs px-2" placeholder="Search..." />
+              </div>
+            </div>
             <table className="w-full min-w-[700px] text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
-                  <th className="py-2.5">Market</th>
-                  <th>Type</th>
-                  <th>Status</th>
-                  <th>Session</th>
-                  <th>Open Result</th>
-                  <th>Close Result</th>
-                  <th>Source</th>
-                  <th>Declared At</th>
+                <tr className="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-white/10">
+                  <th className="py-2.5 px-2">Date</th>
+                  <th className="px-2">Market</th>
+                  <th className="px-2">Time/Slot</th>
+                  <th className="px-2">Result</th>
+                  <th className="px-2">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {declaredResults.map((r: any) => (
-                  <tr key={r.id} className="border-t border-white/5">
-                    <td className="py-3 text-slate-100">{r.market_name} <span className="text-slate-500">#{r.market_id}</span></td>
-                    <td>{r.market_type}</td>
-                    <td><Badge color={statusColor[r.market_status] || "slate"}>{r.market_status}</Badge></td>
-                    <td>{r.session_label || "—"}</td>
-                    <td className="font-mono text-slate-200">{r.open_result || "—"}</td>
-                    <td className="font-mono text-slate-200">{r.close_result || "—"}</td>
-                    <td>
-                      {r.source === "scraper" ? (
-                        <Badge color="violet">Scraper</Badge>
-                      ) : (
-                        <Badge color="green">{r.declared_by_name}</Badge>
-                      )}
-                    </td>
-                    <td className="text-slate-400 text-xs">{r.declared_at ? new Date(r.declared_at).toLocaleString() : "—"}</td>
-                  </tr>
-                ))}
+                {declaredResults.map((r: any) => {
+                  const dateStr = r.result_date 
+                     ? new Date(r.result_date).toLocaleDateString('en-GB') // DD/MM/YYYY
+                     : r.declared_at ? new Date(r.declared_at).toLocaleDateString('en-GB') : "—";
+                  
+                  return (
+                    <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                      <td className="py-3 px-2 text-slate-300">{dateStr}</td>
+                      <td className="px-2 text-slate-100">{r.market_name}</td>
+                      <td className="px-2 text-slate-400">
+                         {r.market_type === 'starline' ? r.session_label : 'Regular'}
+                      </td>
+                      <td className="px-2 font-mono text-emerald-400 font-semibold">
+                         {r.total_result || r.open_result || "—"}
+                      </td>
+                      <td className="px-2">
+                         <Button size="sm" variant="ghost" className="h-7 text-xs">Edit</Button>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
