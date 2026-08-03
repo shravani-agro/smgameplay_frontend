@@ -11,7 +11,6 @@ import {
   Spinner,
   ErrorMsg,
   PageHeader,
-  Switch,
 } from "@/components/ui";
 import {
   listMarkets,
@@ -268,7 +267,9 @@ export default function MarketsPage() {
                       </Badge>
                     </td>
                     <td>
-                      <Switch 
+                      <input 
+                        type="checkbox"
+                        className="w-4 h-4 text-violet-600 bg-gray-700 border-gray-600 rounded focus:ring-violet-500 focus:ring-2"
                         checked={!!m.holiday_status} 
                         onChange={() => toggleHoliday(m)} 
                       />
