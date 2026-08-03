@@ -17,7 +17,6 @@ import {
   listMarkets,
   softDeleteMarket,
   createMarket,
-  createMarket,
   updateMarket,
   reorderMarkets,
 } from "@/lib/admin";
