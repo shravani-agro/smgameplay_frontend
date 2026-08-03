@@ -52,7 +52,7 @@ export default function MarketsPage() {
     setError(null);
     try {
       const data = await listMarkets({});
-      setMarkets(data.sort((a: any, b: any) => (a.sequence_number || 0) - (b.sequence_number || 0)));
+      setMarkets(data.filter((m: any) => m.market_type !== "starline").sort((a: any, b: any) => (a.sequence_number || 0) - (b.sequence_number || 0)));
       setOrderChanged(false);
     } catch (e: any) {
       setError(e?.response?.data?.detail || "Failed to load markets");

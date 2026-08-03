@@ -38,7 +38,7 @@ export default function ResultsPage() {
   const loadMarkets = useCallback(async () => {
     try {
       const data = await listMarkets({});
-      setMarkets(data.filter((m: any) => m.is_active && m.status !== "result_declared"));
+      setMarkets(data.filter((m: any) => m.is_active && m.status !== "result_declared" && m.market_type !== "starline"));
     } catch {
       setMarkets([]);
     }
@@ -297,7 +297,7 @@ export default function ResultsPage() {
                 </tr>
               </thead>
               <tbody>
-                {declaredResults.map((r: any) => {
+                {declaredResults.filter((r: any) => r.market_type !== 'starline').map((r: any) => {
                   const dateStr = r.result_date 
                      ? new Date(r.result_date).toLocaleDateString('en-GB') // DD/MM/YYYY
                      : r.declared_at ? new Date(r.declared_at).toLocaleDateString('en-GB') : "—";
