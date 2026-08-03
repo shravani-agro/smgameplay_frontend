@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, Select, Spinner, ErrorMsg, StatCard, PageHeader, Badge, DataTable } from "@/components/ui";
+import { motion } from "framer-motion";
 import {
   getOverviewStats,
   getRevenueReport,
@@ -104,13 +105,30 @@ export default function DashboardPage() {
 
       <ErrorMsg msg={error} />
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
-        {cards.map((c) => (
-          <StatCard key={c.label} label={c.label} value={c.value ?? "—"} icon={c.icon} accent={c.accent} />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, staggerChildren: 0.1 }}
+        className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4"
+      >
+        {cards.map((c, i) => (
+          <motion.div 
+            key={c.label}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: i * 0.05 }}
+          >
+            <StatCard label={c.label} value={c.value ?? "—"} icon={c.icon} accent={c.accent} />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2"
+      >
         <Card title="Revenue Report" subtitle={`Grouped by ${period}`}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={revenue}>
@@ -140,9 +158,14 @@ export default function DashboardPage() {
             </LineChart>
           </ResponsiveContainer>
         </Card>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+        className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2"
+      >
         <Card title="Top Bettors" subtitle="Highest net profit/loss">
           <DataTable
             getRowKey={(b) => b.user_id}
@@ -176,7 +199,7 @@ export default function DashboardPage() {
             ]}
           />
         </Card>
-      </div>
+      </motion.div>
     </div>
   );
 }

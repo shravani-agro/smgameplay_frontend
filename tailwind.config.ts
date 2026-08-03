@@ -21,12 +21,12 @@ const config: Config = {
           900: "#881337",
         },
         ink: {
-          950: "#070b14",
-          900: "#0b1120",
-          850: "#0f1626",
-          800: "#131c30",
-          700: "#1e293b",
-          600: "#334155",
+          950: "#04060b", // Deeper dark
+          900: "#080c16",
+          850: "#0c1322",
+          800: "#10182b",
+          700: "#1a2642",
+          600: "#2a3c63",
         },
       },
       borderRadius: {
@@ -34,25 +34,36 @@ const config: Config = {
         "2xl": "1.125rem",
       },
       boxShadow: {
-        card: "0 1px 2px rgba(0,0,0,0.4), 0 8px 24px -12px rgba(0,0,0,0.5)",
-        glow: "0 0 0 1px rgba(244,63,94,0.3), 0 8px 30px -8px rgba(225,29,72,0.35)",
+        card: "0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 24px 38px 3px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
+        glow: "0 0 20px rgba(244,63,94,0.35), 0 0 40px rgba(225,29,72,0.15)",
+        "glass-inset": "inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.5)",
       },
       keyframes: {
         "fade-in": {
-          "0%": { opacity: "0", transform: "translateY(4px)" },
+          "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "scale-in": {
           "0%": { opacity: "0", transform: "scale(0.96)" },
           "100%": { opacity: "1", transform: "scale(1)" },
         },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.6" },
+        }
       },
       animation: {
-        "fade-in": "fade-in 0.25s ease-out",
-        "scale-in": "scale-in 0.18s ease-out",
+        "fade-in": "fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "scale-in": "scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "float": "float 6s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       fontFamily: {
-        sans: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
       },
     },
   },
