@@ -8,6 +8,8 @@ import {
   Select,
   Badge,
   Modal,
+  SlideOver,
+  Tabs,
   Spinner,
   ErrorMsg,
   PageHeader,
@@ -21,7 +23,15 @@ import {
   addUserBonus,
   resetUserPassword,
   getUserDetailed,
+  listBids,
+  listDeposits,
+  listWithdrawals,
 } from "@/lib/admin";
+
+const fmt = (n: any) => {
+  if (n === undefined || n === null) return "—";
+  return Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -31,6 +41,12 @@ export default function UsersPage() {
 
   const [selected, setSelected] = useState<any>(null);
   const [detail, setDetail] = useState<any>(null);
+  const [userBids, setUserBids] = useState<any[]>([]);
+  const [userDeposits, setUserDeposits] = useState<any[]>([]);
+  const [userWithdrawals, setUserWithdrawals] = useState<any[]>([]);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  
+  const [activeTab, setActiveTab] = useState("overview");
 
   const [bonusUser, setBonusUser] = useState<any>(null);
   const [bonusAmount, setBonusAmount] = useState("0");
@@ -64,11 +80,26 @@ export default function UsersPage() {
   async function openDetail(user: any) {
     setSelected(user);
     setDetail(null);
+    setUserBids([]);
+    setUserDeposits([]);
+    setUserWithdrawals([]);
+    setActiveTab("overview");
+    setLoadingDetails(true);
     try {
-      const d = await getUserDetailed(user.id);
+      const [d, b, dep, w] = await Promise.all([
+        getUserDetailed(user.id),
+        listBids({ user_id: user.id, limit: 50 }),
+        listDeposits({ user_id: user.id, limit: 50 }),
+        listWithdrawals({ user_id: user.id, limit: 50 }),
+      ]);
       setDetail(d);
-    } catch {
-      // ignore
+      setUserBids(b);
+      setUserDeposits(dep);
+      setUserWithdrawals(w);
+    } catch (e: any) {
+      console.error(e);
+    } finally {
+      setLoadingDetails(false);
     }
   }
 
@@ -83,6 +114,9 @@ export default function UsersPage() {
     setBonusUser(null);
     setActionMsg("Bonus credited successfully");
     load();
+    if (selected && selected.id === bonusUser.id) {
+        openDetail(selected); // refresh details if open
+    }
   }
 
   async function submitReset() {
@@ -96,6 +130,13 @@ export default function UsersPage() {
       setActionError(e?.response?.data?.detail || "Failed to reset password");
     }
   }
+
+  const tabs = [
+    { id: "overview", label: "Overview", icon: "👤" },
+    { id: "bets", label: "Recent Bets", icon: "🎯" },
+    { id: "transactions", label: "Transactions", icon: "💸" },
+    { id: "security", label: "Security & Actions", icon: "🛡️" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -156,12 +197,12 @@ export default function UsersPage() {
                 ),
               },
               { key: "phone", header: "Phone" },
-              { key: "balance", header: "Balance", render: (u) => Number(u.wallet_balance).toFixed(2) },
+              { key: "balance", header: "Balance", render: (u) => fmt(u.wallet_balance) },
               {
                 key: "status",
                 header: "Status",
                 render: (u) => (
-                  <Badge color={u.is_active ? "green" : "red"}>
+                  <Badge color={u.is_active ? "emerald" : "red"}>
                     {u.is_active ? "Active" : "Inactive"}
                   </Badge>
                 ),
@@ -171,18 +212,7 @@ export default function UsersPage() {
                 header: "Actions",
                 className: "text-right",
                 render: (u) => (
-                  <div className="flex flex-wrap justify-end gap-1.5">
-                    <Button size="sm" variant="outline" onClick={() => openDetail(u)}>View</Button>
-                    <Button size="sm" variant="secondary" onClick={() => handleToggle(u)}>
-                      {u.is_active ? "Disable" : "Enable"}
-                    </Button>
-                    <Button size="sm" variant="secondary" onClick={() => { setBonusAmount("0"); setBonusDesc("Bonus credited"); setBonusUser(u); }}>
-                      Bonus
-                    </Button>
-                    <Button size="sm" variant="danger" onClick={() => { setResetPw(""); setResetUser(u); }}>
-                      Reset PW
-                    </Button>
-                  </div>
+                  <Button size="sm" variant="outline" onClick={() => openDetail(u)}>View Profile</Button>
                 ),
               },
             ]}
@@ -190,33 +220,144 @@ export default function UsersPage() {
         )}
       </Card>
 
-      {/* Detail */}
-      <Modal open={!!selected} onClose={() => setSelected(null)} title="User Details" description={selected?.username}>
+      {/* User Detail SlideOver */}
+      <SlideOver
+        open={!!selected}
+        onClose={() => setSelected(null)}
+        title={selected?.username}
+        description={`ID: ${selected?.id} • ${selected?.phone}`}
+      >
         {selected && (
-          <div className="space-y-4 text-sm">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <Field label="Username" value={selected.username} />
-              <Field label="Phone" value={selected.phone} />
-              <Field label="Balance" value={Number(selected.wallet_balance).toFixed(2)} />
-              <Field label="Admin" value={selected.username === "admin" ? "Yes" : "No"} />
-              <Field label="Active" value={selected.is_active ? "Yes" : "No"} />
-            </div>
-            {detail && (
-              <div className="rounded-xl border border-white/5 bg-ink-900/60 p-4">
-                <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Activity
-                </div>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <Field label="Total Bets" value={detail.total_bets} />
-                  <Field label="Total Wins" value={Number(detail.total_wins).toFixed(2)} />
-                  <Field label="Deposits" value={Number(detail.total_deposits).toFixed(2)} />
-                  <Field label="Withdrawals" value={Number(detail.total_withdrawals).toFixed(2)} />
-                </div>
+          <div className="space-y-6">
+            <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+            
+            {loadingDetails ? (
+              <Spinner className="min-h-[200px]" />
+            ) : (
+              <div className="animate-fade-in mt-4">
+                {activeTab === "overview" && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                      <Card bodyClassName="p-4 flex flex-col items-center text-center">
+                        <span className="text-xs text-slate-500 uppercase">Balance</span>
+                        <span className="text-xl font-bold text-emerald-400">₹{fmt(selected.wallet_balance)}</span>
+                      </Card>
+                      <Card bodyClassName="p-4 flex flex-col items-center text-center">
+                        <span className="text-xs text-slate-500 uppercase">Status</span>
+                        <Badge color={selected.is_active ? "emerald" : "red"} className="mt-1">{selected.is_active ? "Active" : "Inactive"}</Badge>
+                      </Card>
+                      <Card bodyClassName="p-4 flex flex-col items-center text-center">
+                        <span className="text-xs text-slate-500 uppercase">Role</span>
+                        <Badge color={selected.username === "admin" ? "brand" : "slate"} className="mt-1">{selected.username === "admin" ? "Owner" : "User"}</Badge>
+                      </Card>
+                    </div>
+
+                    {detail && (
+                      <Card title="Activity Summary">
+                        <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+                          <Field label="Total Bets" value={detail.total_bets} />
+                          <Field label="Total Wins" value={`₹${fmt(detail.total_wins)}`} />
+                          <Field label="Total Deposits" value={`₹${fmt(detail.total_deposits)}`} />
+                          <Field label="Total Withdrawals" value={`₹${fmt(detail.total_withdrawals)}`} />
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === "bets" && (
+                  <Card title="Recent Bets" bodyClassName="p-0">
+                    <DataTable
+                      getRowKey={(b) => b.id}
+                      rows={userBids}
+                      columns={[
+                        { key: "market", header: "Market", render: (b) => b.market_name },
+                        { key: "type", header: "Type", render: (b) => b.bid_type },
+                        { key: "number", header: "Number", render: (b) => <span className="font-bold text-slate-200">{b.bid_number}</span> },
+                        { key: "points", header: "Points", render: (b) => fmt(b.points) },
+                        { key: "status", header: "Status", render: (b) => (
+                           <Badge color={b.status === "won" ? "emerald" : b.status === "lost" ? "red" : "slate"}>
+                             {b.status.toUpperCase()}
+                           </Badge>
+                        )},
+                        { key: "date", header: "Date", render: (b) => new Date(b.created_at).toLocaleDateString() },
+                      ]}
+                    />
+                  </Card>
+                )}
+
+                {activeTab === "transactions" && (
+                  <div className="space-y-6">
+                    <Card title="Recent Deposits" bodyClassName="p-0">
+                      <DataTable
+                        getRowKey={(d) => d.id}
+                        rows={userDeposits}
+                        columns={[
+                          { key: "amount", header: "Amount", render: (d) => <span className="text-emerald-400">+₹{fmt(d.amount)}</span> },
+                          { key: "method", header: "Method", render: (d) => d.payment_method },
+                          { key: "status", header: "Status", render: (d) => (
+                            <Badge color={d.status === "approved" ? "emerald" : d.status === "rejected" ? "red" : "amber"}>
+                              {d.status}
+                            </Badge>
+                          )},
+                          { key: "date", header: "Date", render: (d) => new Date(d.created_at).toLocaleDateString() },
+                        ]}
+                      />
+                    </Card>
+
+                    <Card title="Recent Withdrawals" bodyClassName="p-0">
+                      <DataTable
+                        getRowKey={(w) => w.id}
+                        rows={userWithdrawals}
+                        columns={[
+                          { key: "amount", header: "Amount", render: (w) => <span className="text-red-400">-₹{fmt(w.amount)}</span> },
+                          { key: "method", header: "Method", render: (w) => w.payment_method },
+                          { key: "status", header: "Status", render: (w) => (
+                            <Badge color={w.status === "approved" ? "emerald" : w.status === "rejected" ? "red" : "amber"}>
+                              {w.status}
+                            </Badge>
+                          )},
+                          { key: "date", header: "Date", render: (w) => new Date(w.created_at).toLocaleDateString() },
+                        ]}
+                      />
+                    </Card>
+                  </div>
+                )}
+
+                {activeTab === "security" && (
+                  <div className="space-y-4">
+                    <Card title="Account Status">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-slate-200">Active Status</p>
+                          <p className="text-xs text-slate-500">Prevent this user from logging in or placing bets.</p>
+                        </div>
+                        <Button variant={selected.is_active ? "danger" : "success"} onClick={() => handleToggle(selected)}>
+                          {selected.is_active ? "Disable Account" : "Enable Account"}
+                        </Button>
+                      </div>
+                    </Card>
+
+                    <Card title="Credit Bonus">
+                       <p className="text-xs text-slate-500 mb-4">Add promotional bonus directly to this user's wallet.</p>
+                       <Button onClick={() => { setBonusAmount("0"); setBonusDesc("Bonus credited"); setBonusUser(selected); }}>
+                          Credit Bonus
+                       </Button>
+                    </Card>
+
+                    <Card title="Reset Password">
+                       <p className="text-xs text-slate-500 mb-4">Force a password reset for this user.</p>
+                       <Button variant="danger" onClick={() => { setResetPw(""); setResetUser(selected); }}>
+                          Reset Password
+                       </Button>
+                    </Card>
+                  </div>
+                )}
               </div>
             )}
           </div>
         )}
-      </Modal>
+      </SlideOver>
 
       {/* Bonus modal */}
       <Modal open={!!bonusUser} onClose={() => setBonusUser(null)} title={`Add Bonus — ${bonusUser?.username ?? ""}`}>

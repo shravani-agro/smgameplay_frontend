@@ -87,8 +87,10 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <PageHeader
+    <div className="space-y-6 relative mesh-bg p-6 rounded-3xl border border-white/5 shadow-2xl">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-ink-950/80 pointer-events-none rounded-3xl" />
+      <div className="relative z-10 space-y-6">
+        <PageHeader
         title="Dashboard"
         description="Real-time overview of your platform"
         actions={
@@ -200,6 +202,7 @@ export default function DashboardPage() {
           />
         </Card>
       </motion.div>
+      </div>
     </div>
   );
 }

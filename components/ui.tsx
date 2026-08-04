@@ -22,9 +22,9 @@ export function Card({
   bodyClassName?: string;
 }) {
   return (
-    <div className={cn("card animate-fade-in", className)}>
+    <div className={cn("card animate-fade-in group hover:border-white/20 transition-all duration-300", className)}>
       {(title || actions) && (
-        <div className="flex flex-col gap-3 border-b border-white/5 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-white/5 px-5 py-4 sm:flex-row sm:items-center sm:justify-between bg-white/[0.01]">
           <div>
             {title && <h3 className="text-base font-semibold text-slate-100">{title}</h3>}
             {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
@@ -32,7 +32,7 @@ export function Card({
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </div>
       )}
-      <div className={cn("p-4", bodyClassName)}>{children}</div>
+      <div className={cn("p-5", bodyClassName)}>{children}</div>
     </div>
   );
 }
@@ -307,19 +307,19 @@ export function StatCard({
   delta?: { value: string; positive?: boolean };
 }) {
   const accents: Record<string, string> = {
-    brand: "from-brand-600/20 to-brand-500/5 text-brand-300",
-    emerald: "from-emerald-600/20 to-emerald-500/5 text-emerald-300",
-    amber: "from-amber-600/20 to-amber-500/5 text-amber-300",
-    sky: "from-sky-600/20 to-sky-500/5 text-sky-300",
-    violet: "from-violet-600/20 to-violet-500/5 text-violet-300",
+    brand: "from-brand-600/30 to-brand-500/5 text-brand-300 shadow-brand-500/20",
+    emerald: "from-emerald-600/30 to-emerald-500/5 text-emerald-300 shadow-emerald-500/20",
+    amber: "from-amber-600/30 to-amber-500/5 text-amber-300 shadow-amber-500/20",
+    sky: "from-sky-600/30 to-sky-500/5 text-sky-300 shadow-sky-500/20",
+    violet: "from-violet-600/30 to-violet-500/5 text-violet-300 shadow-violet-500/20",
   };
   return (
-    <div className="card relative overflow-hidden p-4">
-      <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-60", accents[accent])} />
+    <div className="card relative overflow-hidden p-5 group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+      <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-60 transition-opacity duration-300 group-hover:opacity-100", accents[accent].split(" ").slice(0, 2).join(" "))} />
       <div className="relative flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
-          <p className="mt-1.5 text-2xl font-bold text-slate-50">{value}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-400 group-hover:text-slate-300 transition-colors">{label}</p>
+          <p className="mt-1.5 text-3xl font-bold text-slate-50">{value}</p>
           {delta && (
             <p className={cn("mt-1 text-xs font-medium", delta.positive ? "text-emerald-400" : "text-red-400")}>
               {delta.positive ? "▲" : "▼"} {delta.value}
@@ -327,11 +327,83 @@ export function StatCard({
           )}
         </div>
         {icon && (
-          <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-lg", accents[accent])}>
+          <div className={cn("flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-xl backdrop-blur-md shadow-lg transition-transform duration-300 group-hover:scale-110", accents[accent].split(" ")[2])}>
             {icon}
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+export function SlideOver({
+  open,
+  onClose,
+  title,
+  description,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm transition-opacity"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-3xl h-full bg-ink-900 border-l border-white/10 shadow-2xl flex flex-col animate-slide-in-right overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between border-b border-white/5 px-6 py-5 bg-ink-950/50">
+          <div>
+            {title && <h3 className="text-xl font-bold text-slate-100">{title}</h3>}
+            {description && <p className="mt-1 text-sm text-slate-400">{description}</p>}
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-xl p-2 text-slate-400 transition hover:bg-white/10 hover:text-slate-200"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6 scroll-smooth">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+export function Tabs({
+  tabs,
+  activeTab,
+  onChange,
+}: {
+  tabs: { id: string; label: string; icon?: React.ReactNode }[];
+  activeTab: string;
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div className="flex space-x-1 border-b border-white/10 overflow-x-auto no-scrollbar">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => onChange(tab.id)}
+          className={cn(
+            "flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap",
+            activeTab === tab.id
+              ? "border-brand-500 text-brand-400"
+              : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded-t-lg"
+          )}
+        >
+          {tab.icon && <span className="text-lg">{tab.icon}</span>}
+          {tab.label}
+        </button>
+      ))}
     </div>
   );
 }

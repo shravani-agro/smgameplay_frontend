@@ -54,6 +54,10 @@ const config: Config = {
         "pulse-glow": {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.6" },
+        },
+        "slide-in-right": {
+          "0%": { transform: "translateX(100%)" },
+          "100%": { transform: "translateX(0)" },
         }
       },
       animation: {
@@ -61,6 +65,7 @@ const config: Config = {
         "scale-in": "scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "float": "float 6s ease-in-out infinite",
         "pulse-glow": "pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "slide-in-right": "slide-in-right 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
