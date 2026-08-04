@@ -90,9 +90,21 @@ export default function ResultsPage() {
     setError(null);
     setMsg(null);
     try {
-      const payload: any = { market_id: marketId, open_result: openResult };
+      let openRes = openResult;
+      let closeRes = closeResult;
+
+      // Handle the placeholder format "123-45-678" -> "123-4" and "5-678"
+      if (selectedMarket?.market_type === "regular" && openResult.includes("-")) {
+        const parts = openResult.split("-");
+        if (parts.length === 3 && parts[1].length === 2) {
+          openRes = `${parts[0]}-${parts[1][0]}`;
+          closeRes = `${parts[1][1]}-${parts[2]}`;
+        }
+      }
+
+      const payload: any = { market_id: marketId, open_result: openRes };
       if (resultDate) payload.result_date = resultDate;
-      if (closeResult) payload.close_result = closeResult;
+      if (closeRes) payload.close_result = closeRes;
       if (sessionLabel) payload.session_label = sessionLabel;
       const res = await bulkDeclareResults([payload]);
       const first = res.results?.[0];

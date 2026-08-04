@@ -9,7 +9,7 @@ import {
   ErrorMsg,
   PageHeader,
 } from "@/components/ui";
-import { listBids } from "@/lib/admin";
+import { listBids, listMarkets } from "@/lib/admin";
 import type { Bid } from "@/lib/types";
 
 const STATUSES = ["pending", "won", "lost", "cancelled"];
@@ -26,6 +26,16 @@ export default function BidsPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState("");
   const [marketId, setMarketId] = useState("");
+  const [markets, setMarkets] = useState<any[]>([]);
+
+  const loadMarkets = useCallback(async () => {
+    try {
+      const data = await listMarkets({});
+      setMarkets(data);
+    } catch {
+      setMarkets([]);
+    }
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -43,6 +53,10 @@ export default function BidsPage() {
   }, [status, marketId]);
 
   useEffect(() => {
+    loadMarkets();
+  }, [loadMarkets]);
+
+  useEffect(() => {
     load();
   }, [load]);
 
@@ -55,6 +69,9 @@ export default function BidsPage() {
           <div className="flex gap-2">
             <Select value={marketId} onChange={(e) => setMarketId(e.target.value)} className="w-40">
               <option value="">All markets</option>
+              {markets.map((m) => (
+                <option key={m.id} value={m.id}>{m.name}</option>
+              ))}
             </Select>
             <Select value={status} onChange={(e) => setStatus(e.target.value)} className="w-40">
               <option value="">All statuses</option>

@@ -304,7 +304,7 @@ export default function UsersPage() {
                           { key: "amount", header: "Amount", render: (d) => <span className="text-emerald-400">+₹{fmt(d.amount)}</span> },
                           { key: "method", header: "Method", render: (d) => d.payment_method },
                           { key: "status", header: "Status", render: (d) => (
-                            <Badge color={d.status === "approved" ? "emerald" : d.status === "rejected" ? "red" : "amber"}>
+                            <Badge color={d.status === "completed" || d.status === "approved" || d.status === "success" ? "emerald" : d.status === "rejected" || d.status === "failed" ? "red" : "amber"}>
                               {d.status}
                             </Badge>
                           )},
@@ -325,7 +325,7 @@ export default function UsersPage() {
                               {w.status}
                             </Badge>
                           )},
-                          { key: "date", header: "Date", render: (w) => new Date(w.created_at).toLocaleDateString() },
+                          { key: "date", header: "Date", render: (w) => new Date(w.requested_at || w.created_at).toLocaleDateString() },
                         ]}
                       />
                     </Card>

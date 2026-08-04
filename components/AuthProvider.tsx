@@ -25,7 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const token = localStorage.getItem("satta_admin_token") || "";
         const payload = JSON.parse(atob(token.split(".")[1]));
-        setUsername(payload.sub ? String(payload.sub) : null);
+        setUsername(payload.username || payload.full_name || "Admin");
       } catch {
         // ignore
       }
