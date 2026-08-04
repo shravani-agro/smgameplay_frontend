@@ -245,7 +245,7 @@ export default function UsersPage() {
               <div className="animate-fade-in mt-4">
                 {activeTab === "overview" && (
                   <div className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                       <Card bodyClassName="p-4 flex flex-col items-center text-center">
                         <span className="text-xs text-slate-500 uppercase">Balance</span>
                         <span className="text-xl font-bold text-emerald-400">₹{fmt(selected.wallet_balance)}</span>
@@ -262,7 +262,7 @@ export default function UsersPage() {
 
                     {detail && (
                       <Card title="Activity Summary">
-                        <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
                           <Field label="Total Bets" value={detail.total_bets} />
                           <Field label="Total Wins" value={`₹${fmt(detail.total_wins)}`} />
                           <Field label="Total Deposits" value={`₹${fmt(detail.total_deposits)}`} />
@@ -280,9 +280,9 @@ export default function UsersPage() {
                       rows={userBids}
                       columns={[
                         { key: "market", header: "Market", render: (b) => b.market_name },
-                        { key: "type", header: "Type", render: (b) => b.bid_type },
-                        { key: "number", header: "Number", render: (b) => <span className="font-bold text-slate-200">{b.bid_number}</span> },
-                        { key: "points", header: "Points", render: (b) => fmt(b.points) },
+                        { key: "type", header: "Type", render: (b) => b.bet_type },
+                        { key: "number", header: "Number", render: (b) => <span className="font-bold text-slate-200">{b.selected_number}</span> },
+                        { key: "points", header: "Points", render: (b) => fmt(b.amount) },
                         { key: "status", header: "Status", render: (b) => (
                            <Badge color={b.status === "won" ? "emerald" : b.status === "lost" ? "red" : "slate"}>
                              {b.status.toUpperCase()}

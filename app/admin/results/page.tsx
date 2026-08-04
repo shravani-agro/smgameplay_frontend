@@ -42,7 +42,8 @@ export default function ResultsPage() {
   const loadMarkets = useCallback(async () => {
     try {
       const data = await listMarkets({});
-      setMarkets(data.filter((m: any) => m.is_active && m.status !== "result_declared" && m.market_type !== "starline"));
+      // Do not filter by is_active if we want to allow editing declared/closed markets
+      setMarkets(data.filter((m: any) => m.market_type !== "starline"));
     } catch {
       setMarkets([]);
     }
@@ -115,9 +116,13 @@ export default function ResultsPage() {
 
   function handleEdit(r: any) {
     setMarketId(r.market_id);
+    
+    // r.result_date or r.declared_at might be returned as YYYY-MM-DD
+    // If it is a timestamp string, extracting substring(0, 10) works if it's already local,
+    // but if it's UTC, it might shift. Assuming result_date is returned as YYYY-MM-DD from backend.
     const dateStr = r.result_date 
-         ? new Date(r.result_date).toISOString().slice(0, 10)
-         : r.declared_at ? new Date(r.declared_at).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+         ? r.result_date.substring(0, 10)
+         : r.declared_at ? new Date(r.declared_at).toLocaleDateString('en-CA') : new Date().toLocaleDateString('en-CA');
     setResultDate(dateStr);
     setOpenResult(r.open_result || "");
     setCloseResult(r.close_result || "");
@@ -246,7 +251,7 @@ export default function ResultsPage() {
       {loading && !preview && <Spinner />}
       {preview && (
         <Card title={`Preview — Market #${preview.market_id}`}>
-          <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="rounded-xl bg-white/5 p-3">
               <div className="text-xs text-slate-500">Pending bets</div>
               <div className="text-lg font-semibold text-slate-100">{preview.total_pending_bets}</div>
@@ -334,8 +339,8 @@ export default function ResultsPage() {
                   if (filterMarket && r.market_id.toString() !== filterMarket) return false;
                   if (filterDate) {
                     const rDate = r.result_date 
-                       ? new Date(r.result_date).toISOString().slice(0, 10)
-                       : r.declared_at ? new Date(r.declared_at).toISOString().slice(0, 10) : "";
+                       ? r.result_date.substring(0, 10)
+                       : r.declared_at ? new Date(r.declared_at).toLocaleDateString('en-CA') : "";
                     if (rDate !== filterDate) return false;
                   }
                   return true;

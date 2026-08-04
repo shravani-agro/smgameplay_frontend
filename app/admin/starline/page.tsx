@@ -385,7 +385,7 @@ export default function StarlinePage() {
         {edit && (
           <div className="space-y-5 max-h-[80vh] overflow-y-auto pr-2">
             <form onSubmit={saveMarket} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-400">Game Name</label>
                   <Input required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Market Name" />
@@ -419,7 +419,7 @@ export default function StarlinePage() {
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-400">Sequence Number</label>
                   <Input type="number" value={formData.sequence_number} onChange={(e) => setFormData({ ...formData, sequence_number: parseInt(e.target.value) || 0 })} placeholder="0" />
