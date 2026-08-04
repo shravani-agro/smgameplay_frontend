@@ -20,6 +20,14 @@ import {
   reorderMarkets,
 } from "@/lib/admin";
 
+const TIME_OPTIONS = Array.from({ length: 24 * 12 }, (_, i) => {
+  const h = Math.floor(i / 12).toString().padStart(2, "0");
+  const m = ((i % 12) * 5).toString().padStart(2, "0");
+  const ampm = Math.floor(i / 12) >= 12 ? "PM" : "AM";
+  const h12 = Math.floor(i / 12) % 12 || 12;
+  return { value: `${h}:${m}`, label: `${h12}:${m} ${ampm}` };
+});
+
 export default function MarketsPage() {
   const [markets, setMarkets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,12 +96,12 @@ export default function MarketsPage() {
       name: m.name || "",
       market_type: m.market_type || "regular",
       game_days: m.game_days || "Mon-Sat",
-      open_time: m.open_time || "",
-      close_time: m.close_time || "",
-      open_start_time: m.open_start_time || "",
-      open_stop_time: m.open_stop_time || "",
-      close_start_time: m.close_start_time || "",
-      close_stop_time: m.close_stop_time || "",
+      open_time: (m.open_time || "").substring(0, 5),
+      close_time: (m.close_time || "").substring(0, 5),
+      open_start_time: (m.open_start_time || "").substring(0, 5),
+      open_stop_time: (m.open_stop_time || "").substring(0, 5),
+      close_start_time: (m.close_start_time || "").substring(0, 5),
+      close_stop_time: (m.close_stop_time || "").substring(0, 5),
       sequence_number: m.sequence_number || 0,
       holiday_status: m.holiday_status || false,
       schedules: m.schedules || [],
@@ -329,33 +337,51 @@ export default function MarketsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Open Time</label>
-                      <Input type="time" required value={formData.open_time} onChange={(e) => setFormData({ ...formData, open_time: e.target.value })} placeholder="--:--" />
+                      <Select required value={formData.open_time} onChange={(e) => setFormData({ ...formData, open_time: e.target.value })}>
+                        <option value="">Select Time</option>
+                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                      </Select>
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Close Time</label>
-                      <Input type="time" required value={formData.close_time} onChange={(e) => setFormData({ ...formData, close_time: e.target.value })} placeholder="--:--" />
+                      <Select required value={formData.close_time} onChange={(e) => setFormData({ ...formData, close_time: e.target.value })}>
+                        <option value="">Select Time</option>
+                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                      </Select>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Open Start Time</label>
-                      <Input type="time" value={formData.open_start_time} onChange={(e) => setFormData({ ...formData, open_start_time: e.target.value })} placeholder="--:--" />
+                      <Select value={formData.open_start_time} onChange={(e) => setFormData({ ...formData, open_start_time: e.target.value })}>
+                        <option value="">Select Time</option>
+                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                      </Select>
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Open Stop Time</label>
-                      <Input type="time" value={formData.open_stop_time} onChange={(e) => setFormData({ ...formData, open_stop_time: e.target.value })} placeholder="--:--" />
+                      <Select value={formData.open_stop_time} onChange={(e) => setFormData({ ...formData, open_stop_time: e.target.value })}>
+                        <option value="">Select Time</option>
+                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                      </Select>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Close Start Time</label>
-                      <Input type="time" value={formData.close_start_time} onChange={(e) => setFormData({ ...formData, close_start_time: e.target.value })} placeholder="--:--" />
+                      <Select value={formData.close_start_time} onChange={(e) => setFormData({ ...formData, close_start_time: e.target.value })}>
+                        <option value="">Select Time</option>
+                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                      </Select>
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Close Stop Time</label>
-                      <Input type="time" value={formData.close_stop_time} onChange={(e) => setFormData({ ...formData, close_stop_time: e.target.value })} placeholder="--:--" />
+                      <Select value={formData.close_stop_time} onChange={(e) => setFormData({ ...formData, close_stop_time: e.target.value })}>
+                        <option value="">Select Time</option>
+                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                      </Select>
                     </div>
                   </div>
                 </>
