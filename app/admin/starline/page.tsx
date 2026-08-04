@@ -131,9 +131,13 @@ export default function StarlinePage() {
 
   async function confirmRemove() {
     if (!confirmDelete) return;
-    await softDeleteMarket(confirmDelete.id);
-    setConfirmDelete(null);
-    load();
+    try {
+      await softDeleteMarket(confirmDelete.id);
+      setConfirmDelete(null);
+      load();
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || "Failed to delete market");
+    }
   }
 
   function addSchedule() {

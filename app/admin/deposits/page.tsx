@@ -52,9 +52,13 @@ export default function DepositsPage() {
 
   async function doProcess() {
     if (!confirm) return;
-    await processDeposit(confirm.txn, confirm.action);
-    setConfirm(null);
-    load();
+    try {
+      await processDeposit(confirm.txn, confirm.action);
+      setConfirm(null);
+      load();
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || "Failed to process deposit");
+    }
   }
 
   return (

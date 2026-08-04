@@ -104,18 +104,26 @@ export default function UsersPage() {
   }
 
   async function handleToggle(user: any) {
-    await toggleUserActive(user.id);
-    load();
+    try {
+      await toggleUserActive(user.id);
+      load();
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || "Failed to toggle user status");
+    }
   }
 
   async function submitBonus() {
     if (!bonusUser) return;
-    await addUserBonus(bonusUser.id, parseFloat(bonusAmount), bonusDesc);
-    setBonusUser(null);
-    setActionMsg("Bonus credited successfully");
-    load();
-    if (selected && selected.id === bonusUser.id) {
-        openDetail(selected); // refresh details if open
+    try {
+      await addUserBonus(bonusUser.id, parseFloat(bonusAmount), bonusDesc);
+      setBonusUser(null);
+      setActionMsg("Bonus credited successfully");
+      load();
+      if (selected && selected.id === bonusUser.id) {
+          openDetail(selected); // refresh details if open
+      }
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || "Failed to credit bonus");
     }
   }
 

@@ -11,8 +11,9 @@ import {
   ErrorMsg,
   PageHeader,
   EmptyState,
+  Modal,
 } from "@/components/ui";
-import { listMarkets, listResults, previewResult, bulkDeclareResults } from "@/lib/admin";
+import { listMarkets, listResults, previewResult, bulkDeclareResults, deleteResult } from "@/lib/admin";
 
 const statusColor: Record<string, any> = {
   upcoming: "slate",
@@ -34,6 +35,9 @@ export default function ResultsPage() {
   const [loadingResults, setLoadingResults] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [filterDate, setFilterDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [filterMarket, setFilterMarket] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState<any>(null);
 
   const loadMarkets = useCallback(async () => {
     try {
@@ -106,6 +110,30 @@ export default function ResultsPage() {
       setError(e?.response?.data?.detail || "Failed to declare result");
     } finally {
       setLoading(false);
+    }
+  }
+
+  function handleEdit(r: any) {
+    setMarketId(r.market_id);
+    const dateStr = r.result_date 
+         ? new Date(r.result_date).toISOString().slice(0, 10)
+         : r.declared_at ? new Date(r.declared_at).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+    setResultDate(dateStr);
+    setOpenResult(r.open_result || "");
+    setCloseResult(r.close_result || "");
+    setSessionLabel(r.session_label || "");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function confirmRemove() {
+    if (!confirmDelete) return;
+    try {
+      await deleteResult(confirmDelete.id);
+      setConfirmDelete(null);
+      setMsg("Result deleted successfully");
+      loadResults();
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || "Failed to delete result");
     }
   }
 
@@ -271,15 +299,20 @@ export default function ResultsPage() {
           <EmptyState title="No results declared yet" />
         ) : (
           <div className="table-wrap">
-            <div className="mb-4 flex items-center justify-between text-sm text-slate-400">
-              <div className="flex items-center gap-2">
-                <span>Show</span>
-                <Select className="w-16 h-8 text-xs py-1 px-2">
-                   <option>10</option>
-                   <option>25</option>
-                   <option>50</option>
-                </Select>
-                <span>entries</span>
+            <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between text-sm text-slate-400">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span>Date:</span>
+                  <Input type="date" className="h-8 w-40 text-xs px-2" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} />
+                  <Button size="sm" variant="ghost" onClick={() => setFilterDate("")} className="h-8 px-2 text-xs">Clear</Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>Market:</span>
+                  <Select className="h-8 w-40 text-xs px-2" value={filterMarket} onChange={(e) => setFilterMarket(e.target.value)}>
+                    <option value="">All Markets</option>
+                    {markets.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                  </Select>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                  <span>Search:</span>
@@ -297,7 +330,16 @@ export default function ResultsPage() {
                 </tr>
               </thead>
               <tbody>
-                {declaredResults.filter((r: any) => r.market_type !== 'starline').map((r: any) => {
+                {declaredResults.filter((r: any) => r.market_type !== 'starline').filter((r: any) => {
+                  if (filterMarket && r.market_id.toString() !== filterMarket) return false;
+                  if (filterDate) {
+                    const rDate = r.result_date 
+                       ? new Date(r.result_date).toISOString().slice(0, 10)
+                       : r.declared_at ? new Date(r.declared_at).toISOString().slice(0, 10) : "";
+                    if (rDate !== filterDate) return false;
+                  }
+                  return true;
+                }).map((r: any) => {
                   const dateStr = r.result_date 
                      ? new Date(r.result_date).toLocaleDateString('en-GB') // DD/MM/YYYY
                      : r.declared_at ? new Date(r.declared_at).toLocaleDateString('en-GB') : "—";
@@ -312,8 +354,9 @@ export default function ResultsPage() {
                       <td className="px-2 font-mono text-emerald-400 font-semibold">
                          {r.total_result || r.open_result || "—"}
                       </td>
-                      <td className="px-2">
-                         <Button size="sm" variant="ghost" className="h-7 text-xs">Edit</Button>
+                      <td className="px-2 whitespace-nowrap">
+                         <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => handleEdit(r)}>Edit</Button>
+                         <Button size="sm" variant="danger" className="h-7 text-xs ml-2" onClick={() => setConfirmDelete(r)}>Delete</Button>
                       </td>
                     </tr>
                   )
@@ -323,6 +366,20 @@ export default function ResultsPage() {
           </div>
         )}
       </Card>
+
+      <Modal
+        open={!!confirmDelete}
+        onClose={() => setConfirmDelete(null)}
+        title="Delete Result"
+      >
+        <p className="text-sm text-slate-300">
+          Are you sure you want to delete this result for <b>{confirmDelete?.market_name}</b>?
+        </p>
+        <div className="mt-5 flex justify-end gap-2">
+          <Button variant="ghost" onClick={() => setConfirmDelete(null)}>Cancel</Button>
+          <Button variant="danger" onClick={confirmRemove}>Delete</Button>
+        </div>
+      </Modal>
     </div>
   );
 }

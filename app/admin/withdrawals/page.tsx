@@ -59,16 +59,24 @@ export default function WithdrawalsPage() {
 
   async function doProcess() {
     if (!confirm) return;
-    await processWithdrawal(confirm.id, confirm.action);
-    setConfirm(null);
-    load();
+    try {
+      await processWithdrawal(confirm.id, confirm.action);
+      setConfirm(null);
+      load();
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || "Failed to process withdrawal");
+    }
   }
 
   async function bulkApprove() {
     if (selected.length === 0) return;
-    await bulkApproveWithdrawals(selected);
-    setSelected([]);
-    load();
+    try {
+      await bulkApproveWithdrawals(selected);
+      setSelected([]);
+      load();
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || "Failed to bulk approve withdrawals");
+    }
   }
 
   return (

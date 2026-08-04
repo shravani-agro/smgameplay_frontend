@@ -144,6 +144,11 @@ export async function bulkDeclareResults(results: any[]) {
   return res.data;
 }
 
+export async function deleteResult(resultId: number) {
+  const res = await client.delete(`/admin/results/${resultId}`);
+  return res.data;
+}
+
 /* ---------------- Admin: Withdrawals ---------------- */
 
 export async function listWithdrawals(params: any = {}) {
