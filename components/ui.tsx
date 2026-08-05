@@ -435,27 +435,28 @@ export function TimePickerModal({
   onChange: (val: string) => void;
 }) {
   const [mode, setMode] = React.useState<"h" | "m">("h");
-  const [h24, m] = (value || "00:00").split(":").map(Number);
-  const hour24 = isNaN(h24) ? 0 : h24;
-  const minute = isNaN(m) ? 0 : m;
-  
-  const [tempH, setTempH] = React.useState(hour24);
-  const [tempM, setTempM] = React.useState(minute);
+  const [tempH, setTempH] = React.useState(12);
+  const [tempM, setTempM] = React.useState(0);
+  const [isDragging, setIsDragging] = React.useState(false);
 
   React.useEffect(() => {
     if (open) {
-      setTempH(isNaN(h24) ? 0 : h24);
-      setTempM(isNaN(m) ? 0 : m);
+      if (value) {
+        const [h, m] = value.split(":").map(Number);
+        if (!isNaN(h) && !isNaN(m)) {
+          setTempH(h);
+          setTempM(m);
+        }
+      }
       setMode("h");
     }
-  }, [open, h24, m]);
-
-  if (!open) return null;
+  }, [open, value]);
 
   const isPM = tempH >= 12;
   const displayH = tempH % 12 || 12;
 
-  const handleClockAction = (e: React.PointerEvent<HTMLDivElement>, isDragging = false) => {
+  const handleClockAction = (e: React.PointerEvent<HTMLDivElement>, dragging = false) => {
+    setIsDragging(dragging);
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left - 130;
     const y = e.clientY - rect.top - 130;
@@ -468,7 +469,7 @@ export function TimePickerModal({
       
       let newH = isPM ? (h === 12 ? 12 : h + 12) : (h === 12 ? 0 : h);
       setTempH(newH);
-      if (!isDragging && e.type === "pointerup") {
+      if (!dragging && e.type === "pointerup") {
          setMode("m");
       }
     } else {
@@ -484,8 +485,24 @@ export function TimePickerModal({
   const handAngle = mode === "h" ? (displayH * 30) : (tempM * 6);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-[320px] rounded-2xl bg-ink-900 shadow-2xl animate-scale-in overflow-hidden border border-white/10" onClick={e => e.stopPropagation()}>
+    <AnimatePresence>
+      {open && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" 
+          onClick={onClose}
+        >
+          <motion.div 
+            initial={{ scale: 0.95, opacity: 0, y: 10 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 10 }}
+            transition={{ type: "spring", damping: 25, stiffness: 400 }}
+            className="w-[320px] rounded-2xl bg-ink-900 shadow-2xl overflow-hidden border border-white/10" 
+            onClick={e => e.stopPropagation()}
+          >
         <div className="flex items-center justify-center gap-6 bg-brand-600 p-6">
            <div className="flex items-baseline gap-1 text-5xl font-light text-white">
              <span className={cn("cursor-pointer transition-opacity", mode === "h" ? "opacity-100" : "opacity-60 hover:opacity-80")} onClick={() => setMode("h")}>
@@ -518,7 +535,10 @@ export function TimePickerModal({
              style={{ touchAction: "none" }}
            >
               <div 
-                className="absolute top-1/2 left-1/2 w-0.5 h-[90px] bg-brand-500 origin-bottom transition-transform duration-200 ease-out"
+                className={cn(
+                  "absolute top-1/2 left-1/2 w-0.5 h-[90px] bg-brand-500 origin-bottom ease-out",
+                  !isDragging && "transition-transform duration-300"
+                )}
                 style={{ transform: `translate(-50%, -100%) rotate(${handAngle}deg)` }}
               >
                  <div className="absolute -top-4 -left-[14px] h-8 w-8 rounded-full bg-brand-500/20 flex items-center justify-center">
@@ -555,8 +575,10 @@ export function TimePickerModal({
               onClose();
            }}>OK</Button>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
