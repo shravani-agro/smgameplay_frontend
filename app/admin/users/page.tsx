@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { format } from "date-fns";
 import {
   Card,
   Button,
@@ -21,12 +22,14 @@ import {
   listUsers,
   toggleUserActive,
   addUserBonus,
+  deductUserFunds,
   resetUserPassword,
   getUserDetailed,
   listBids,
   listDeposits,
   listWithdrawals,
 } from "@/lib/admin";
+import { parseApiError } from "@/lib/error-parser";
 
 const fmt = (n: any) => {
   if (n === undefined || n === null) return "—";
@@ -67,7 +70,7 @@ export default function UsersPage() {
       const data = await listUsers(params);
       setUsers(data);
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load users");
+      setError(parseApiError(e, "Failed to load users"));
     } finally {
       setLoading(false);
     }
@@ -108,7 +111,7 @@ export default function UsersPage() {
       await toggleUserActive(user.id);
       load();
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to toggle user status");
+      setError(parseApiError(e, "Failed to toggle user status"));
     }
   }
 
@@ -123,7 +126,28 @@ export default function UsersPage() {
           openDetail(selected); // refresh details if open
       }
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to credit bonus");
+      setError(parseApiError(e, "Failed to credit bonus"));
+    }
+  }
+
+  const [deductUser, setDeductUser] = useState<any>(null);
+  const [deductAmount, setDeductAmount] = useState("0");
+  const [deductDesc, setDeductDesc] = useState("Manual deduction");
+
+  async function submitDeduct() {
+    if (!deductUser) return;
+    try {
+      // Need to import deductUserFunds from "@/lib/admin" first
+      const { deductUserFunds } = await import("@/lib/admin");
+      await deductUserFunds(deductUser.id, parseFloat(deductAmount), deductDesc);
+      setDeductUser(null);
+      setActionMsg("Funds deducted successfully");
+      load();
+      if (selected && selected.id === deductUser.id) {
+          openDetail(selected);
+      }
+    } catch (e: any) {
+      setError(parseApiError(e, "Failed to deduct funds"));
     }
   }
 
@@ -135,7 +159,7 @@ export default function UsersPage() {
       setResetPw("");
       setActionMsg("Password reset successfully");
     } catch (e: any) {
-      setActionError(e?.response?.data?.detail || "Failed to reset password");
+      setActionError(parseApiError(e, "Failed to reset password"));
     }
   }
 
@@ -288,7 +312,7 @@ export default function UsersPage() {
                              {b.status.toUpperCase()}
                            </Badge>
                         )},
-                        { key: "date", header: "Date", render: (b) => new Date(b.created_at).toLocaleDateString() },
+                        { key: "date", header: "Date", render: (b) => format(new Date(b.created_at), "dd/MM/yyyy") },
                       ]}
                     />
                   </Card>
@@ -308,7 +332,7 @@ export default function UsersPage() {
                               {d.status}
                             </Badge>
                           )},
-                          { key: "date", header: "Date", render: (d) => new Date(d.created_at).toLocaleDateString() },
+                          { key: "date", header: "Date", render: (d) => format(new Date(d.created_at), "dd/MM/yyyy") },
                         ]}
                       />
                     </Card>
@@ -325,7 +349,7 @@ export default function UsersPage() {
                               {w.status}
                             </Badge>
                           )},
-                          { key: "date", header: "Date", render: (w) => new Date(w.requested_at || w.created_at).toLocaleDateString() },
+                          { key: "date", header: "Date", render: (w) => format(new Date(w.requested_at || w.created_at), "dd/MM/yyyy") },
                         ]}
                       />
                     </Card>
@@ -350,6 +374,13 @@ export default function UsersPage() {
                        <p className="text-xs text-slate-500 mb-4">Add promotional bonus directly to this user's wallet.</p>
                        <Button onClick={() => { setBonusAmount("0"); setBonusDesc("Bonus credited"); setBonusUser(selected); }}>
                           Credit Bonus
+                       </Button>
+                    </Card>
+
+                    <Card title="Deduct Funds">
+                       <p className="text-xs text-slate-500 mb-4">Manually deduct funds from this user's wallet.</p>
+                       <Button variant="danger" onClick={() => { setDeductAmount("0"); setDeductDesc("Manual deduction"); setDeductUser(selected); }}>
+                          Deduct Funds
                        </Button>
                     </Card>
 
@@ -379,6 +410,22 @@ export default function UsersPage() {
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setBonusUser(null)}>Cancel</Button>
             <Button onClick={submitBonus}>Credit</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Deduct modal */}
+      <Modal open={!!deductUser} onClose={() => setDeductUser(null)} title={`Deduct Funds — ${deductUser?.username ?? ""}`}>
+        <div className="space-y-4">
+          <Field label="Amount">
+            <Input type="number" value={deductAmount} onChange={(e) => setDeductAmount(e.target.value)} />
+          </Field>
+          <Field label="Description / Reason">
+            <Input value={deductDesc} onChange={(e) => setDeductDesc(e.target.value)} />
+          </Field>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setDeductUser(null)}>Cancel</Button>
+            <Button variant="danger" onClick={submitDeduct}>Deduct</Button>
           </div>
         </div>
       </Modal>

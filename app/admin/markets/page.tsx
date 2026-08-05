@@ -12,6 +12,7 @@ import {
   ErrorMsg,
   PageHeader,
 } from "@/components/ui";
+import { parseApiError } from "@/lib/error-parser";
 import {
   listMarkets,
   softDeleteMarket,
@@ -63,7 +64,7 @@ export default function MarketsPage() {
       setMarkets(data.filter((m: any) => m.is_active !== false && m.market_type !== "starline").sort((a: any, b: any) => (a.sequence_number || 0) - (b.sequence_number || 0)));
       setOrderChanged(false);
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load markets");
+      setError(parseApiError(e, "Failed to load markets"));
     } finally {
       setLoading(false);
     }
@@ -148,7 +149,7 @@ export default function MarketsPage() {
       setConfirmDelete(null);
       load();
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to delete market");
+      setError(parseApiError(e, "Failed to delete market"));
     }
   }
 

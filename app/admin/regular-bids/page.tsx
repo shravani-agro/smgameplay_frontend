@@ -11,6 +11,7 @@ import {
   Button,
 } from "@/components/ui";
 import { listMarkets, getBidsSummary } from "@/lib/admin";
+import { parseApiError } from "@/lib/error-parser";
 
 const BET_TYPES = [
   { key: "single_ank", label: "Single Digit" },
@@ -57,7 +58,7 @@ export default function RegularBidDataPage() {
       });
       setSummaryData(data);
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load bid summary");
+      setError(parseApiError(e, "Failed to load bid summary"));
     } finally {
       setLoading(false);
     }
@@ -85,7 +86,7 @@ export default function RegularBidDataPage() {
   const copyToClipboard = () => {
     const marketName = markets.find(m => m.id.toString() === marketId)?.name || "Unknown Market";
     const nowTime = format(new Date(), "hh:mm a").toLowerCase();
-    const formattedDate = format(new Date(bidDate), "dd-MM-yyyy");
+    const formattedDate = format(new Date(bidDate), "dd/MM/yyyy");
     const header = `${marketName} ₹ :\nDate and Time   ${nowTime} ${formattedDate}\n`;
 
     let body = "";

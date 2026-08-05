@@ -13,6 +13,7 @@ import {
   PageHeader,
   Field,
 } from "@/components/ui";
+import { parseApiError } from "@/lib/error-parser";
 import {
   getSettings,
   updateSetting,
@@ -46,7 +47,7 @@ export default function SettingsPage() {
       const data = await getSettings();
       setSettings(data);
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load settings");
+      setError(parseApiError(e, "Failed to load settings"));
     } finally {
       setLoading(false);
     }

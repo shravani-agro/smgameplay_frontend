@@ -10,6 +10,7 @@ import {
   getTopBettors,
   getUserGrowth,
 } from "@/lib/admin";
+import { parseApiError } from "@/lib/error-parser";
 import {
   BarChart,
   Bar,
@@ -62,7 +63,7 @@ export default function DashboardPage() {
       setTopBettors(t);
       setGrowth(g);
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load dashboard");
+      setError(parseApiError(e, "Failed to load dashboard"));
     } finally {
       setLoading(false);
     }

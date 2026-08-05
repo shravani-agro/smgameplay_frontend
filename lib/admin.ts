@@ -6,12 +6,7 @@ export interface LoginResult {
 }
 
 export async function login(username: string, password: string): Promise<LoginResult> {
-  const params = new URLSearchParams();
-  params.append("username", username);
-  params.append("password", password);
-  const res = await client.post<LoginResult>("/auth/login", params, {
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  });
+  const res = await client.post<LoginResult>("/auth/login", { username, password });
   setToken(res.data.access_token);
   return res.data;
 }
@@ -93,6 +88,15 @@ export async function addUserBonus(userId: number, amount: number, description: 
   return res.data;
 }
 
+export async function deductUserFunds(userId: number, amount: number, description: string) {
+  const res = await client.post(
+    `/admin/users/${userId}/deduct`,
+    { user_id: userId, amount, description },
+    { params: {} }
+  );
+  return res.data;
+}
+
 export async function resetUserPassword(userId: number, newPassword: string) {
   const res = await client.put(`/admin/users/${userId}/reset-password`, null, {
     params: { new_password: newPassword },
@@ -157,7 +161,7 @@ export async function listWithdrawals(params: any = {}) {
 }
 
 export async function processWithdrawal(requestId: number, action: string) {
-  const res = await client.post(`/admin/withdrawals/${requestId}/${action}`);
+  const res = await client.post(`/admin/withdrawals/${requestId}/${action}`, {});
   return res.data;
 }
 
@@ -226,5 +230,80 @@ export async function sendUserNotification(userId: number, title: string, messag
   const res = await client.post("/admin/notifications/send", null, {
     params: { user_id: userId, title, message },
   });
+  return res.data;
+}
+
+/* ---------------- Admin: Game Rates ---------------- */
+export async function getGameRates(marketId?: number) {
+  const params: any = {};
+  if (marketId !== undefined) params.market_id = marketId;
+  const res = await client.get("/admin/game-rates", { params });
+  return res.data;
+}
+
+export async function updateGameRates(payload: any) {
+  const res = await client.post("/admin/game-rates", payload);
+  return res.data;
+}
+
+/* ---------------- Admin: Rollback / Cancel ---------------- */
+export async function cancelBet(id: number) {
+  const res = await client.post(`/admin/bids/${id}/cancel`, {});
+  return res.data;
+}
+
+export async function cancelStarlineBet(id: number) {
+  const res = await client.post(`/admin/starline/bids/${id}/cancel`, {});
+  return res.data;
+}
+
+export async function rollbackResult(id: number) {
+  const res = await client.post(`/admin/results/${id}/rollback`, {});
+  return res.data;
+}
+
+/* ---------------- Admin: Starline ---------------- */
+export async function listStarlineMarkets(params: any = {}) {
+  const res = await client.get("/admin/starline/markets", { params });
+  return res.data;
+}
+
+export async function createStarlineMarket(data: any) {
+  const res = await client.post("/admin/starline/markets", data);
+  return res.data;
+}
+
+export async function updateStarlineMarket(marketId: number, data: any) {
+  const res = await client.put(`/admin/starline/markets/${marketId}`, data);
+  return res.data;
+}
+
+export async function softDeleteStarlineMarket(marketId: number) {
+  const res = await client.delete(`/admin/starline/markets/${marketId}`);
+  return res.data;
+}
+
+export async function reorderStarlineMarkets(markets: { id: number; sequence_number: number }[]) {
+  const res = await client.post("/admin/starline/markets/reorder", { markets });
+  return res.data;
+}
+
+export async function listStarlineBids(params: any = {}) {
+  const res = await client.get("/admin/starline/bids", { params });
+  return res.data;
+}
+
+export async function getStarlineBidsSummary(params: any = {}) {
+  const res = await client.get("/admin/starline/bids/summary", { params });
+  return res.data;
+}
+
+export async function listStarlineResults(params: any = {}) {
+  const res = await client.get("/admin/starline/results", { params });
+  return res.data;
+}
+
+export async function bulkDeclareStarlineResults(results: any[]) {
+  const res = await client.post("/admin/starline/results/bulk-declare", { results });
   return res.data;
 }

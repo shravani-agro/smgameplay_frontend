@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { format } from "date-fns";
 import {
   Card,
   Button,
@@ -10,8 +11,10 @@ import {
   ErrorMsg,
   PageHeader,
   Modal,
+  Input,
 } from "@/components/ui";
 import { listWithdrawals, processWithdrawal, bulkApproveWithdrawals } from "@/lib/admin";
+import { parseApiError } from "@/lib/error-parser";
 
 const STATUSES = ["pending", "approved", "rejected", "processed"];
 const statusColor: Record<string, any> = {
@@ -26,6 +29,8 @@ export default function WithdrawalsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState("pending");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [selected, setSelected] = useState<number[]>([]);
   const [confirm, setConfirm] = useState<{ id: number; action: string } | null>(null);
 
@@ -35,13 +40,20 @@ export default function WithdrawalsPage() {
     try {
       const params: any = {};
       if (status) params.status = status;
+      if (dateFrom) params.date_from = new Date(dateFrom).toISOString();
+      if (dateTo) {
+         // set dateTo to end of day to include the full day
+         const dt = new Date(dateTo);
+         dt.setHours(23, 59, 59, 999);
+         params.date_to = dt.toISOString();
+      }
       setItems(await listWithdrawals(params));
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load withdrawals");
+      setError(parseApiError(e, "Failed to load withdrawals"));
     } finally {
       setLoading(false);
     }
-  }, [status]);
+  }, [status, dateFrom, dateTo]);
 
   useEffect(() => {
     load();
@@ -64,7 +76,7 @@ export default function WithdrawalsPage() {
       setConfirm(null);
       load();
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to process withdrawal");
+      setError(parseApiError(e, "Failed to process withdrawal"));
     }
   }
 
@@ -75,7 +87,7 @@ export default function WithdrawalsPage() {
       setSelected([]);
       load();
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to bulk approve withdrawals");
+      setError(parseApiError(e, "Failed to bulk approve withdrawals"));
     }
   }
 
@@ -85,17 +97,20 @@ export default function WithdrawalsPage() {
         title="Withdrawals"
         description="Approve, process or reject payout requests"
         actions={
-          <>
-            <Button onClick={bulkApprove} disabled={selected.length === 0 || status !== "pending"}>
+          <div className="flex flex-wrap gap-2 items-center">
+            <Button onClick={bulkApprove} disabled={selected.length === 0 || status !== "pending"} className="mr-2">
               Bulk Approve ({selected.length})
             </Button>
-            <Select value={status} onChange={(e) => setStatus(e.target.value)} className="w-44">
+            <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-36 h-9 text-xs" />
+            <span className="text-slate-400">to</span>
+            <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-36 h-9 text-xs" />
+            <Select value={status} onChange={(e) => setStatus(e.target.value)} className="w-36 h-9 text-xs">
               <option value="">All statuses</option>
               {STATUSES.map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </Select>
-          </>
+          </div>
         }
       />
       <ErrorMsg msg={error} />
@@ -143,7 +158,7 @@ export default function WithdrawalsPage() {
                       <Badge color={statusColor[w.status] ?? "slate"}>{w.status}</Badge>
                     </td>
                     <td className="text-slate-400">
-                      {new Date(w.requested_at).toLocaleString()}
+                      {format(new Date(w.requested_at), "dd/MM/yyyy hh:mm a")}
                     </td>
                     <td>
                       <div className="flex flex-wrap justify-end gap-1.5">

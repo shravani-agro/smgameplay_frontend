@@ -13,10 +13,12 @@ const NAV = [
   { href: "/admin/starline", label: "Starline", icon: "⭐" },
   { href: "/admin/results", label: "Results", icon: "🎯" },
   { href: "/admin/deposits", label: "Deposits", icon: "➕" },
-  { href: "/admin/bids", label: "Bids", icon: "🎲" },
+  { href: "/admin/bids", label: "Regular Bids History", icon: "🎲" },
+  { href: "/admin/starline-bids-history", label: "Starline Bids History", icon: "🎲" },
   { href: "/admin/regular-bids", label: "Regular Bid Data", icon: "📊" },
   { href: "/admin/starline-bids", label: "Starline Bid Data", icon: "📈" },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: "💸" },
+  { href: "/admin/game-rates", label: "Game Rates", icon: "💰" },
   { href: "/admin/audit", label: "Audit Logs", icon: "🛡" },
   { href: "/admin/settings", label: "Settings", icon: "⚙" },
 ];

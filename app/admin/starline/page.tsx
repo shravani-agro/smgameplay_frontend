@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { format } from "date-fns";
 import {
   Card,
   Button,
@@ -13,13 +14,14 @@ import {
   PageHeader,
   EmptyState,
 } from "@/components/ui";
+import { parseApiError } from "@/lib/error-parser";
 import {
-  listMarkets,
-  softDeleteMarket,
-  createMarket,
-  updateMarket,
-  listResults,
-  bulkDeclareResults,
+  listStarlineMarkets,
+  softDeleteStarlineMarket,
+  createStarlineMarket,
+  updateStarlineMarket,
+  listStarlineResults,
+  bulkDeclareStarlineResults,
 } from "@/lib/admin";
 
 export default function StarlinePage() {
@@ -54,10 +56,10 @@ export default function StarlinePage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await listMarkets({});
-      setMarkets(data.filter((m: any) => m.market_type === "starline").sort((a: any, b: any) => (a.sequence_number || 0) - (b.sequence_number || 0)));
+      const data = await listStarlineMarkets({});
+      setMarkets(data.sort((a: any, b: any) => (a.sequence_number || 0) - (b.sequence_number || 0)));
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load starline markets");
+      setError(parseApiError(e, "Failed to load starline markets"));
     } finally {
       setLoading(false);
     }
@@ -66,8 +68,8 @@ export default function StarlinePage() {
   const loadResults = useCallback(async () => {
     setLoadingResults(true);
     try {
-      const data = await listResults();
-      setDeclaredResults(data.filter((r: any) => r.market_type === "starline"));
+      const data = await listStarlineResults();
+      setDeclaredResults(data);
     } catch {
       setDeclaredResults([]);
     } finally {
@@ -109,7 +111,7 @@ export default function StarlinePage() {
     e.preventDefault();
     try {
       const payload: any = {
-        name: formData.name,
+        name: "Starline Market",
         market_type: "starline",
         game_days: formData.game_days,
         sequence_number: Number(formData.sequence_number),
@@ -117,10 +119,10 @@ export default function StarlinePage() {
         schedules: formData.schedules,
       };
 
-      if (edit?.isNew) {
-        await createMarket(payload);
+      if (edit.isNew) {
+        await createStarlineMarket({ ...payload, market_type: "starline" });
       } else {
-        await updateMarket(edit.id, payload);
+        await updateStarlineMarket(edit.id, payload);
       }
       setEdit(null);
       load();
@@ -132,13 +134,53 @@ export default function StarlinePage() {
   async function confirmRemove() {
     if (!confirmDelete) return;
     try {
-      await softDeleteMarket(confirmDelete.id);
+      await softDeleteStarlineMarket(confirmDelete.id);
       setConfirmDelete(null);
       load();
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to delete market");
+      setError(parseApiError(e, "Failed to delete market"));
     }
   }
+
+  const dragItem = React.useRef<any>(null);
+  const dragOverItem = React.useRef<any>(null);
+  const [orderChanged, setOrderChanged] = useState(false);
+  const [isReordering, setIsReordering] = useState(false);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    dragItem.current = index;
+  };
+
+  const handleDragEnter = (e: React.DragEvent, index: number) => {
+    dragOverItem.current = index;
+  };
+
+  const handleDragEnd = () => {
+    if (dragItem.current !== null && dragOverItem.current !== null && dragItem.current !== dragOverItem.current) {
+      const _markets = [...markets];
+      const draggedItemContent = _markets.splice(dragItem.current, 1)[0];
+      _markets.splice(dragOverItem.current, 0, draggedItemContent);
+      setMarkets(_markets);
+      setOrderChanged(true);
+    }
+    dragItem.current = null;
+    dragOverItem.current = null;
+  };
+
+  const saveOrder = async () => {
+    setIsReordering(true);
+    try {
+      const payload = markets.map((m, idx) => ({ id: m.id, sequence_number: idx + 1 }));
+      const { reorderStarlineMarkets } = await import("@/lib/admin");
+      await reorderStarlineMarkets(payload);
+      setOrderChanged(false);
+      load();
+    } catch (err: any) {
+      alert("Failed to save reordered markets.");
+    } finally {
+      setIsReordering(false);
+    }
+  };
 
   function addSchedule() {
     setFormData({
@@ -162,7 +204,7 @@ export default function StarlinePage() {
   const toggleHoliday = async (market: any) => {
     try {
       const newStatus = !market.holiday_status;
-      await updateMarket(market.id, { holiday_status: newStatus });
+      await updateStarlineMarket(market.id, { holiday_status: newStatus });
       setMarkets(markets.map(m => m.id === market.id ? { ...m, holiday_status: newStatus } : m));
     } catch (err: any) {
       alert("Failed to update holiday status");
@@ -182,7 +224,7 @@ export default function StarlinePage() {
         result_date: resultDate,
         session_label: sessionLabel
       };
-      const res = await bulkDeclareResults([payload]);
+      const res = await bulkDeclareStarlineResults([payload]);
       const first = res.results?.[0];
       if (first?.status === "error") {
         setError(first.detail || "Failed to declare result");
@@ -193,7 +235,7 @@ export default function StarlinePage() {
         loadResults();
       }
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to declare result");
+      setError(parseApiError(e, "Failed to declare result"));
     } finally {
       setIsDeclaring(false);
     }
@@ -207,9 +249,11 @@ export default function StarlinePage() {
         title="Starline Markets"
         description="Manage Starline multi-result markets, time slots, and results"
         actions={
-          <Button onClick={openCreate} className="gap-2">
-            <span>+</span> Create Starline Market
-          </Button>
+          markets.length === 0 ? (
+            <Button onClick={openCreate} className="gap-2">
+              <span>+</span> Create Starline Market
+            </Button>
+          ) : null
         }
       />
       <ErrorMsg msg={error} />
@@ -223,7 +267,17 @@ export default function StarlinePage() {
         
         {/* Left Column: List of Markets */}
         <div className="lg:col-span-2 space-y-6">
-          <Card title={`Active Markets (${markets.length})`} bodyClassName="p-0">
+          <Card 
+            title={`Active Markets (${markets.length})`} 
+            bodyClassName="p-0"
+            actions={
+              orderChanged ? (
+                <Button size="sm" onClick={saveOrder} disabled={isReordering}>
+                  {isReordering ? "Saving..." : "Save Order"}
+                </Button>
+              ) : null
+            }
+          >
             {loading ? (
               <div className="p-4"><Spinner /></div>
             ) : (
@@ -231,6 +285,7 @@ export default function StarlinePage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                      <th className="py-2.5 px-4 w-8"></th>
                       <th className="py-2.5 px-4">Name</th>
                       <th>Time Slots</th>
                       <th>Holiday</th>
@@ -238,8 +293,19 @@ export default function StarlinePage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {markets.map((m) => (
-                      <tr key={m.id} className="border-t border-white/5 hover:bg-white/[0.02]">
+                    {markets.map((m, index) => (
+                      <tr 
+                        key={m.id} 
+                        className="border-t border-white/5 hover:bg-white/[0.02]"
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragEnter={(e) => handleDragEnter(e, index)}
+                        onDragEnd={handleDragEnd}
+                        onDragOver={(e) => e.preventDefault()}
+                      >
+                        <td className="px-4 text-slate-500 cursor-move w-8">
+                          <svg className="w-4 h-4 opacity-50 hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16"></path></svg>
+                        </td>
                         <td className="py-3 px-4 font-medium text-slate-100">
                           {m.name} {m.holiday_status && <Badge color="amber" className="ml-2">Holiday</Badge>}
                         </td>
@@ -292,8 +358,8 @@ export default function StarlinePage() {
                   <tbody>
                     {declaredResults.map((r: any) => {
                       const dateStr = r.result_date 
-                         ? new Date(r.result_date).toLocaleDateString('en-GB') 
-                         : r.declared_at ? new Date(r.declared_at).toLocaleDateString('en-GB') : "—";
+                         ? format(new Date(r.result_date), "dd/MM/yyyy")
+                         : r.declared_at ? format(new Date(r.declared_at), "dd/MM/yyyy") : "—";
                       
                       return (
                         <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.02]">
@@ -381,18 +447,22 @@ export default function StarlinePage() {
       </div>
 
       {/* Edit Market Modal */}
-      <Modal open={!!edit} onClose={() => setEdit(null)} title={edit?.isNew ? "Create Starline Market" : `Edit Market: ${edit?.name || ""}`}>
+      <Modal open={!!edit} onClose={() => setEdit(null)} title={edit?.isNew ? "Create Starline Market" : `Edit Market Settings`}>
         {edit && (
           <div className="space-y-5 max-h-[80vh] overflow-y-auto pr-2">
             <form onSubmit={saveMarket} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-400">Game Name</label>
-                  <Input required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Market Name" />
+                  <label className="mb-1 block text-xs font-medium text-slate-400">Game Days</label>
+                  <Select value={formData.game_days} onChange={(e) => setFormData({ ...formData, game_days: e.target.value })}>
+                     <option value="Mon-Sun">Mon-Sun (Everyday)</option>
+                     <option value="Mon-Sat">Mon-Sat</option>
+                     <option value="Mon-Fri">Mon-Fri</option>
+                  </Select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-400">Game Days</label>
-                  <Input value={formData.game_days} onChange={(e) => setFormData({ ...formData, game_days: e.target.value })} placeholder="e.g. Mon-Sun" />
+                  <label className="mb-1 block text-xs font-medium text-slate-400">Sequence Number</label>
+                  <Input type="number" value={formData.sequence_number} onChange={(e) => setFormData({ ...formData, sequence_number: parseInt(e.target.value) || 0 })} placeholder="0" />
                 </div>
               </div>
 
@@ -419,11 +489,7 @@ export default function StarlinePage() {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-400">Sequence Number</label>
-                  <Input type="number" value={formData.sequence_number} onChange={(e) => setFormData({ ...formData, sequence_number: parseInt(e.target.value) || 0 })} placeholder="0" />
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-400">Holiday Status</label>
                   <div className="flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3">

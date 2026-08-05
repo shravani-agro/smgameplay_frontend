@@ -10,7 +10,8 @@ import {
   PageHeader,
   Button,
 } from "@/components/ui";
-import { listMarkets, getBidsSummary } from "@/lib/admin";
+import { listStarlineMarkets, getStarlineBidsSummary } from "@/lib/admin";
+import { parseApiError } from "@/lib/error-parser";
 
 const BET_TYPES = [
   { key: "single_ank", label: "Single Digit" },
@@ -30,8 +31,8 @@ export default function StarlineBidDataPage() {
 
   const loadMarkets = useCallback(async () => {
     try {
-      const data = await listMarkets({});
-      const starlineMarkets = data.filter((m: any) => m.market_type === "starline");
+      const data = await listStarlineMarkets({});
+      const starlineMarkets = data;
       setMarkets(starlineMarkets);
       if (starlineMarkets.length > 0) {
         setMarketId(starlineMarkets[0].id.toString());
@@ -50,14 +51,14 @@ export default function StarlineBidDataPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getBidsSummary({
+      const data = await getStarlineBidsSummary({
         market_id: Number(marketId),
         bid_date: bidDate,
         session: session || undefined,
       });
       setSummaryData(data);
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load bid summary");
+      setError(parseApiError(e, "Failed to load bid summary"));
     } finally {
       setLoading(false);
     }
@@ -84,7 +85,7 @@ export default function StarlineBidDataPage() {
   const copyToClipboard = () => {
     const marketName = markets.find(m => m.id.toString() === marketId)?.name || "Unknown Market";
     const nowTime = format(new Date(), "hh:mm a").toLowerCase();
-    const formattedDate = format(new Date(bidDate), "dd-MM-yyyy");
+    const formattedDate = format(new Date(bidDate), "dd/MM/yyyy");
     const header = `${marketName} ₹ :\nDate and Time   ${nowTime} ${formattedDate}\n`;
 
     let body = "";

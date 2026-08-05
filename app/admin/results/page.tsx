@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { format } from "date-fns";
 import {
   Card,
   Button,
@@ -13,7 +14,8 @@ import {
   EmptyState,
   Modal,
 } from "@/components/ui";
-import { listMarkets, listResults, previewResult, bulkDeclareResults, deleteResult } from "@/lib/admin";
+import { listMarkets, listResults, previewResult, bulkDeclareResults, deleteResult, rollbackResult } from "@/lib/admin";
+import { parseApiError } from "@/lib/error-parser";
 
 const statusColor: Record<string, any> = {
   upcoming: "slate",
@@ -38,11 +40,11 @@ export default function ResultsPage() {
   const [filterDate, setFilterDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [filterMarket, setFilterMarket] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
+  const [confirmRollback, setConfirmRollback] = useState<any>(null);
 
   const loadMarkets = useCallback(async () => {
     try {
       const data = await listMarkets({});
-      // Do not filter by is_active if we want to allow editing declared/closed markets
       setMarkets(data.filter((m: any) => m.market_type !== "starline"));
     } catch {
       setMarkets([]);
@@ -72,7 +74,7 @@ export default function ResultsPage() {
     try {
       setPreview(await previewResult(marketId));
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load preview");
+      setError(parseApiError(e, "Failed to load preview"));
     } finally {
       setLoading(false);
     }
@@ -93,7 +95,6 @@ export default function ResultsPage() {
       let openRes = openResult;
       let closeRes = closeResult;
 
-      // Handle the placeholder format "123-45-678" -> "123-4" and "5-678"
       if (selectedMarket?.market_type === "regular" && openResult.includes("-")) {
         const parts = openResult.split("-");
         if (parts.length === 3 && parts[1].length === 2) {
@@ -120,7 +121,7 @@ export default function ResultsPage() {
         loadResults();
       }
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to declare result");
+      setError(parseApiError(e, "Failed to declare result"));
     } finally {
       setLoading(false);
     }
@@ -128,13 +129,9 @@ export default function ResultsPage() {
 
   function handleEdit(r: any) {
     setMarketId(r.market_id);
-    
-    // r.result_date or r.declared_at might be returned as YYYY-MM-DD
-    // If it is a timestamp string, extracting substring(0, 10) works if it's already local,
-    // but if it's UTC, it might shift. Assuming result_date is returned as YYYY-MM-DD from backend.
     const dateStr = r.result_date 
          ? r.result_date.substring(0, 10)
-         : r.declared_at ? new Date(r.declared_at).toLocaleDateString('en-CA') : new Date().toLocaleDateString('en-CA');
+         : r.declared_at ? format(new Date(r.declared_at), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd");
     setResultDate(dateStr);
     setOpenResult(r.open_result || "");
     setCloseResult(r.close_result || "");
@@ -150,7 +147,19 @@ export default function ResultsPage() {
       setMsg("Result deleted successfully");
       loadResults();
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to delete result");
+      setError(parseApiError(e, "Failed to delete result"));
+    }
+  }
+
+  async function executeRollback() {
+    if (!confirmRollback) return;
+    try {
+      const res = await rollbackResult(confirmRollback.id);
+      setConfirmRollback(null);
+      setMsg(res.message || "Result rolled back successfully");
+      loadResults();
+    } catch (e: any) {
+      setError(parseApiError(e, "Failed to rollback result"));
     }
   }
 
@@ -352,14 +361,14 @@ export default function ResultsPage() {
                   if (filterDate) {
                     const rDate = r.result_date 
                        ? r.result_date.substring(0, 10)
-                       : r.declared_at ? new Date(r.declared_at).toLocaleDateString('en-CA') : "";
+                       : r.declared_at ? format(new Date(r.declared_at), "yyyy-MM-dd") : "";
                     if (rDate !== filterDate) return false;
                   }
                   return true;
                 }).map((r: any) => {
                   const dateStr = r.result_date 
-                     ? new Date(r.result_date).toLocaleDateString('en-GB') // DD/MM/YYYY
-                     : r.declared_at ? new Date(r.declared_at).toLocaleDateString('en-GB') : "—";
+                     ? format(new Date(r.result_date), "dd/MM/yyyy")
+                     : r.declared_at ? format(new Date(r.declared_at), "dd/MM/yyyy") : "—";
                   
                   return (
                     <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.02]">
@@ -373,6 +382,7 @@ export default function ResultsPage() {
                       </td>
                       <td className="px-2 whitespace-nowrap">
                          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => handleEdit(r)}>Edit</Button>
+                         <Button size="sm" variant="secondary" className="h-7 text-xs ml-2" onClick={() => setConfirmRollback(r)}>Rollback</Button>
                          <Button size="sm" variant="danger" className="h-7 text-xs ml-2" onClick={() => setConfirmDelete(r)}>Delete</Button>
                       </td>
                     </tr>
@@ -383,6 +393,21 @@ export default function ResultsPage() {
           </div>
         )}
       </Card>
+
+      <Modal
+        open={!!confirmRollback}
+        onClose={() => setConfirmRollback(null)}
+        title="Rollback Result"
+      >
+        <p className="text-sm text-slate-300">
+          Are you sure you want to rollback this result for <b>{confirmRollback?.market_name}</b>?
+          This will revert all settled bets to pending and deduct any winnings that were paid out.
+        </p>
+        <div className="mt-5 flex justify-end gap-2">
+          <Button variant="ghost" onClick={() => setConfirmRollback(null)}>Cancel</Button>
+          <Button variant="secondary" onClick={executeRollback}>Rollback</Button>
+        </div>
+      </Modal>
 
       <Modal
         open={!!confirmDelete}

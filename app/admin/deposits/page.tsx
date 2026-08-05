@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { format } from "date-fns";
 import {
   Card,
   Button,
@@ -10,9 +11,11 @@ import {
   ErrorMsg,
   PageHeader,
   Modal,
+  Input,
 } from "@/components/ui";
 import { listDeposits, processDeposit } from "@/lib/admin";
 import type { DepositRequest } from "@/lib/types";
+import { parseApiError } from "@/lib/error-parser";
 
 const STATUSES = ["pending", "completed", "rejected"];
 const statusColor: Record<string, any> = {
@@ -25,7 +28,9 @@ export default function DepositsPage() {
   const [items, setItems] = useState<DepositRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState("pending");
+  const [status, setStatus] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [confirm, setConfirm] = useState<{ txn: string; action: string } | null>(null);
 
   const load = useCallback(async () => {
@@ -34,13 +39,20 @@ export default function DepositsPage() {
     try {
       const params: any = {};
       if (status) params.status = status;
+      if (dateFrom) params.date_from = new Date(dateFrom).toISOString();
+      if (dateTo) {
+         // set dateTo to end of day to include the full day
+         const dt = new Date(dateTo);
+         dt.setHours(23, 59, 59, 999);
+         params.date_to = dt.toISOString();
+      }
       setItems(await listDeposits(params));
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load deposits");
+      setError(parseApiError(e, "Failed to load deposits"));
     } finally {
       setLoading(false);
     }
-  }, [status]);
+  }, [status, dateFrom, dateTo]);
 
   useEffect(() => {
     load();
@@ -57,7 +69,7 @@ export default function DepositsPage() {
       setConfirm(null);
       load();
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to process deposit");
+      setError(parseApiError(e, "Failed to process deposit"));
     }
   }
 
@@ -67,12 +79,17 @@ export default function DepositsPage() {
         title="Deposits"
         description="Approve or reject user deposit requests"
         actions={
-          <Select value={status} onChange={(e) => setStatus(e.target.value)} className="w-44">
-            <option value="">All statuses</option>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </Select>
+          <div className="flex flex-wrap gap-2 items-center">
+            <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-36 h-9 text-xs" />
+            <span className="text-slate-400">to</span>
+            <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-36 h-9 text-xs" />
+            <Select value={status} onChange={(e) => setStatus(e.target.value)} className="w-36 h-9 text-xs">
+              <option value="">All statuses</option>
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </Select>
+          </div>
         }
       />
       <ErrorMsg msg={error} />
@@ -105,7 +122,7 @@ export default function DepositsPage() {
                       <Badge color={statusColor[d.status] ?? "slate"}>{d.status}</Badge>
                     </td>
                     <td className="text-slate-400">
-                      {new Date(d.created_at).toLocaleString()}
+                      {format(new Date(d.created_at), "dd/MM/yyyy hh:mm a")}
                     </td>
                     <td>
                       <div className="flex flex-wrap justify-end gap-1.5">

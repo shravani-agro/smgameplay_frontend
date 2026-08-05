@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Input, Select, Spinner, ErrorMsg, PageHeader, Badge, EmptyState } from "@/components/ui";
 import { getAuditLogs } from "@/lib/admin";
+import { parseApiError } from "@/lib/error-parser";
 
 export default function AuditPage() {
   const [logs, setLogs] = useState<any[]>([]);
@@ -20,7 +21,7 @@ export default function AuditPage() {
       if (adminId) params.admin_id = adminId;
       setLogs(await getAuditLogs(params));
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Failed to load audit logs");
+      setError(parseApiError(e, "Failed to load audit logs"));
     } finally {
       setLoading(false);
     }

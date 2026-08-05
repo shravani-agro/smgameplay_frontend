@@ -11,7 +11,7 @@ import {
   PageHeader,
   Button,
 } from "@/components/ui";
-import { listBids, listMarkets, cancelBet } from "@/lib/admin";
+import { listStarlineBids, listStarlineMarkets, cancelStarlineBet } from "@/lib/admin";
 import type { Bid } from "@/lib/types";
 import { parseApiError } from "@/lib/error-parser";
 
@@ -23,7 +23,7 @@ const statusColor: Record<string, any> = {
   cancelled: "slate",
 };
 
-export default function BidsPage() {
+export default function StarlineBidsHistoryPage() {
   const [items, setItems] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,8 +33,8 @@ export default function BidsPage() {
 
   const loadMarkets = useCallback(async () => {
     try {
-      const data = await listMarkets({});
-      setMarkets(data.filter((m: any) => m.market_type === "regular"));
+      const data = await listStarlineMarkets({});
+      setMarkets(data);
     } catch {
       setMarkets([]);
     }
@@ -44,10 +44,10 @@ export default function BidsPage() {
     setLoading(true);
     setError(null);
     try {
-      const params: any = { market_type: "regular" };
+      const params: any = {};
       if (status) params.status = status;
       if (marketId) params.market_id = Number(marketId);
-      setItems(await listBids(params));
+      setItems(await listStarlineBids(params));
     } catch (e: any) {
       setError(parseApiError(e, "Failed to load bids"));
     } finally {
@@ -58,7 +58,7 @@ export default function BidsPage() {
   const handleCancel = async (id: number) => {
     if (!confirm("Are you sure you want to cancel this bet?")) return;
     try {
-      await cancelBet(id);
+      await cancelStarlineBet(id);
       load(); // refresh
     } catch (e: any) {
       alert(parseApiError(e, "Failed to cancel bet"));
@@ -76,8 +76,8 @@ export default function BidsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Regular Bids History"
-        description="View all individual placed bets for regular games"
+        title="Starline Bids History"
+        description="View all individual placed bets for starline games"
         actions={
           <div className="flex gap-2">
             <Select value={marketId} onChange={(e) => setMarketId(e.target.value)} className="w-40">
