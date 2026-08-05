@@ -329,12 +329,12 @@ export function StatCard({
     violet: "from-violet-600/30 to-violet-500/5 text-violet-300 shadow-violet-500/20",
   };
   return (
-    <div className="card relative overflow-hidden p-5 group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+    <div className="card relative overflow-hidden p-4 sm:p-5 group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
       <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-60 transition-opacity duration-300 group-hover:opacity-100", accents[accent].split(" ").slice(0, 2).join(" "))} />
-      <div className="relative flex items-start justify-between">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-400 group-hover:text-slate-300 transition-colors">{label}</p>
-          <p className="mt-1.5 text-3xl font-bold text-slate-50">{value}</p>
+      <div className="relative flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wide text-slate-400 group-hover:text-slate-300 transition-colors truncate">{label}</p>
+          <p className="mt-1 sm:mt-1.5 text-2xl sm:text-3xl font-bold text-slate-50 truncate">{value}</p>
           {delta && (
             <p className={cn("mt-1 text-xs font-medium", delta.positive ? "text-emerald-400" : "text-red-400")}>
               {delta.positive ? "▲" : "▼"} {delta.value}
@@ -342,7 +342,7 @@ export function StatCard({
           )}
         </div>
         {icon && (
-          <div className={cn("flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-xl backdrop-blur-md shadow-lg transition-transform duration-300 group-hover:scale-110", accents[accent].split(" ")[2])}>
+          <div className={cn("flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-white/10 text-base sm:text-xl backdrop-blur-md shadow-lg transition-transform duration-300 group-hover:scale-110", accents[accent].split(" ")[2])}>
             {icon}
           </div>
         )}
@@ -500,7 +500,7 @@ export function TimePickerModal({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 10 }}
             transition={{ type: "spring", damping: 25, stiffness: 400 }}
-            className="w-[320px] rounded-2xl bg-ink-900 shadow-2xl overflow-hidden border border-white/10" 
+            className="w-full max-w-[320px] rounded-2xl bg-ink-900 shadow-2xl overflow-hidden border border-white/10" 
             onClick={e => e.stopPropagation()}
           >
         <div className="flex items-center justify-center gap-6 bg-brand-600 p-6">
