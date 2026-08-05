@@ -488,6 +488,7 @@ export function TimePickerModal({
     <AnimatePresence>
       {open && (
         <motion.div 
+          key="time-picker-backdrop"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -496,6 +497,7 @@ export function TimePickerModal({
           onClick={onClose}
         >
           <motion.div 
+            key="time-picker-content"
             initial={{ scale: 0.95, opacity: 0, y: 10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 10 }}
@@ -514,8 +516,28 @@ export function TimePickerModal({
              </span>
            </div>
            <div className="flex flex-col gap-1.5 text-sm font-semibold">
-             <button type="button" className={cn("rounded-md px-2.5 py-1 transition-colors", !isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} onClick={() => setTempH(tempH >= 12 ? tempH - 12 : tempH)}>AM</button>
-             <button type="button" className={cn("rounded-md px-2.5 py-1 transition-colors", isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} onClick={() => setTempH(tempH < 12 ? tempH + 12 : tempH)}>PM</button>
+             <button 
+               type="button" 
+               className={cn("rounded-md px-2.5 py-1 transition-colors", !isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} 
+               onClick={(e) => {
+                 e.preventDefault();
+                 e.stopPropagation();
+                 setTempH(tempH >= 12 ? tempH - 12 : tempH);
+               }}
+             >
+               AM
+             </button>
+             <button 
+               type="button" 
+               className={cn("rounded-md px-2.5 py-1 transition-colors", isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} 
+               onClick={(e) => {
+                 e.preventDefault();
+                 e.stopPropagation();
+                 setTempH(tempH < 12 ? tempH + 12 : tempH);
+               }}
+             >
+               PM
+             </button>
            </div>
         </div>
 
