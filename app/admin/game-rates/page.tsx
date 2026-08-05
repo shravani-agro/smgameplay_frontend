@@ -19,8 +19,6 @@ const REGULAR_BET_TYPES = [
   { key: "single_patti", label: "Single Pana" },
   { key: "double_patti", label: "Double Pana" },
   { key: "triple_patti", label: "Triple Pana" },
-  { key: "half_sangam", label: "Half Sangam" },
-  { key: "full_sangam", label: "Full Sangam" },
 ];
 
 const STARLINE_BET_TYPES = [
@@ -110,53 +108,54 @@ export default function GameRatesPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card title="Regular Markets" subtitle="Applies to all regular games">
-             <div className="space-y-4">
-               {REGULAR_BET_TYPES.map((bt) => (
-                 <div key={bt.key} className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-ink-950">
-                    <div>
-                      <div className="font-medium text-slate-200">{bt.label}</div>
-                      <div className="text-xs text-slate-500 font-mono mt-1">Key: {bt.key}</div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                       <span className="text-sm font-semibold text-slate-400">1 ₹ :</span>
-                       <Input 
-                         type="number"
-                         step="0.01"
-                         value={formRates[bt.key] || ""}
-                         onChange={(e) => handleRateChange(bt.key, e.target.value)}
-                         placeholder="e.g. 9.5"
-                         className="w-24 text-right"
-                       />
-                    </div>
-                 </div>
-               ))}
-             </div>
+            <div className="space-y-4">
+              {REGULAR_BET_TYPES.map((bt) => (
+                <div key={bt.key} className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-ink-950">
+                  <div>
+                    <div className="font-medium text-slate-200">{bt.label}</div>
+                    <div className="text-xs text-slate-500 font-mono mt-1">Key: {bt.key}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-slate-400">1 ₹ :</span>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formRates[bt.key] || ""}
+                      onChange={(e) => handleRateChange(bt.key, e.target.value)}
+                      placeholder="e.g. 9.5"
+                      className="w-24 text-right"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </Card>
 
           <Card title="Starline Markets" subtitle="Applies to all starline games">
-             <div className="space-y-4">
-               {STARLINE_BET_TYPES.map((bt) => {
-                 const starlineKey = `starline_${bt.key}`;
-                 return (
-                 <div key={bt.key} className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-ink-950">
+            <div className="space-y-4">
+              {STARLINE_BET_TYPES.map((bt) => {
+                const starlineKey = `starline_${bt.key}`;
+                return (
+                  <div key={bt.key} className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-ink-950">
                     <div>
                       <div className="font-medium text-slate-200">{bt.label} <Badge color="violet">Starline</Badge></div>
                       <div className="text-xs text-slate-500 font-mono mt-1">Key: {starlineKey}</div>
                     </div>
                     <div className="flex items-center gap-3">
-                       <span className="text-sm font-semibold text-slate-400">1 ₹ :</span>
-                       <Input 
-                         type="number"
-                         step="0.01"
-                         value={formRates[starlineKey] || ""}
-                         onChange={(e) => handleRateChange(starlineKey, e.target.value)}
-                         placeholder="e.g. 10.0"
-                         className="w-24 text-right"
-                       />
+                      <span className="text-sm font-semibold text-slate-400">1 ₹ :</span>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formRates[starlineKey] || ""}
+                        onChange={(e) => handleRateChange(starlineKey, e.target.value)}
+                        placeholder="e.g. 10.0"
+                        className="w-24 text-right"
+                      />
                     </div>
-                 </div>
-               )})}
-             </div>
+                  </div>
+                )
+              })}
+            </div>
           </Card>
         </div>
       )}
