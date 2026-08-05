@@ -514,8 +514,8 @@ export function TimePickerModal({
              </span>
            </div>
            <div className="flex flex-col gap-1.5 text-sm font-semibold">
-             <button className={cn("rounded-md px-2.5 py-1 transition-colors", !isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} onClick={() => setTempH(tempH >= 12 ? tempH - 12 : tempH)}>AM</button>
-             <button className={cn("rounded-md px-2.5 py-1 transition-colors", isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} onClick={() => setTempH(tempH < 12 ? tempH + 12 : tempH)}>PM</button>
+             <button type="button" className={cn("rounded-md px-2.5 py-1 transition-colors", !isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} onClick={() => setTempH(tempH >= 12 ? tempH - 12 : tempH)}>AM</button>
+             <button type="button" className={cn("rounded-md px-2.5 py-1 transition-colors", isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} onClick={() => setTempH(tempH < 12 ? tempH + 12 : tempH)}>PM</button>
            </div>
         </div>
 
