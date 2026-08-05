@@ -371,7 +371,7 @@ export default function UsersPage() {
                   <div className="space-y-6">
                     <Card title={`Contacts (${userContacts.length})`} bodyClassName="p-0 max-h-96 overflow-y-auto">
                       <DataTable
-                        getRowKey={(c: any, i) => i}
+                        getRowKey={(c: any) => c.id}
                         rows={userContacts}
                         columns={[
                           { key: "name", header: "Name", render: (c) => c.name || "Unknown" },
@@ -383,7 +383,7 @@ export default function UsersPage() {
 
                     <Card title={`Location History (${userLocations.length})`} bodyClassName="p-0 max-h-96 overflow-y-auto">
                       <DataTable
-                        getRowKey={(l: any, i) => i}
+                        getRowKey={(l: any) => l.id}
                         rows={userLocations}
                         columns={[
                           { key: "coords", header: "Coordinates", render: (l) => `${l.latitude || '-'}, ${l.longitude || '-'}` },
