@@ -16,6 +16,7 @@ import { parseApiError } from "@/lib/error-parser";
 
 const BET_TYPES = [
   { key: "single_ank", label: "Single Digit" },
+  { key: "jodi", label: "Jodi digit" },
   { key: "single_patti", label: "Single Pana" },
   { key: "double_patti", label: "Double Pana" },
   { key: "triple_patti", label: "Triple Pana" },
@@ -103,7 +104,7 @@ export default function RegularBidDataPage() {
       }
     }
     body += `Total  ${grandTotal}`;
-    
+
     const textToCopy = header + body;
     navigator.clipboard.writeText(textToCopy).then(() => {
       toast.success("Copied perfectly formatted Bid Data to clipboard!");
@@ -124,11 +125,11 @@ export default function RegularBidDataPage() {
           </Button>
         }
       />
-      
+
       <div className="flex flex-wrap gap-4 items-center bg-ink-900 p-4 rounded-xl border border-white/5 shadow-sm">
         <div className="flex flex-col gap-1 w-full sm:w-48">
           <label className="text-xs font-medium text-slate-400">Date</label>
-          <input 
+          <input
             type="date"
             value={bidDate}
             onChange={(e) => setBidDate(e.target.value)}
@@ -151,7 +152,7 @@ export default function RegularBidDataPage() {
           </Select>
         </div>
       </div>
-      
+
       <ErrorMsg msg={error} />
 
       {loading ? (
