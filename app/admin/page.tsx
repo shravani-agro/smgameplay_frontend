@@ -18,8 +18,8 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   CartesianGrid,
   Cell,
 } from "recharts";
@@ -30,10 +30,13 @@ const fmt = (n: any) => {
 };
 
 const tooltipStyle = {
-  background: "#0f1626",
+  background: "rgba(4, 6, 11, 0.8)",
+  backdropFilter: "blur(12px)",
   border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 12,
-  fontSize: 12,
+  borderRadius: "12px",
+  fontSize: "12px",
+  color: "#e2e8f0",
+  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)",
 } as const;
 
 export default function DashboardPage() {
@@ -144,21 +147,27 @@ export default function DashboardPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="period" stroke="#64748b" fontSize={12} tickLine={false} />
               <YAxis stroke="#64748b" fontSize={12} tickLine={false} />
-              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
-              <Bar dataKey="amount" fill="url(#rev)" radius={[6, 6, 0, 0]} maxBarSize={48} />
+              <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: "#f43f5e" }} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+              <Bar dataKey="amount" fill="url(#rev)" radius={[6, 6, 0, 0]} maxBarSize={48} animationDuration={1500} />
             </BarChart>
           </ResponsiveContainer>
         </Card>
 
         <Card title="User Growth" subtitle="New users over last 30 days">
           <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={growth}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="date" stroke="#64748b" fontSize={12} tickLine={false} />
-              <YAxis stroke="#64748b" fontSize={12} tickLine={false} />
-              <Tooltip contentStyle={tooltipStyle} />
-              <Line type="monotone" dataKey="count" stroke="#10b981" strokeWidth={2.5} dot={false} />
-            </LineChart>
+            <AreaChart data={growth}>
+              <defs>
+                <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey="date" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+              <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+              <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: "#10b981" }} />
+              <Area type="monotone" dataKey="count" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#growthGrad)" animationDuration={1500} />
+            </AreaChart>
           </ResponsiveContainer>
         </Card>
       </motion.div>

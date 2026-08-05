@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 
 export function cn(...parts: Array<string | false | null | undefined>) {
   return parts.filter(Boolean).join(" ");
@@ -88,14 +89,14 @@ export function Badge({
   className?: string;
 }) {
   const colors: Record<string, string> = {
-    slate: "bg-white/5 text-slate-300 ring-1 ring-inset ring-white/10",
-    green: "bg-emerald-500/10 text-emerald-300 ring-1 ring-inset ring-emerald-500/20",
-    red: "bg-red-500/10 text-red-300 ring-1 ring-inset ring-red-500/20",
-    amber: "bg-amber-500/10 text-amber-300 ring-1 ring-inset ring-amber-500/20",
-    blue: "bg-sky-500/10 text-sky-300 ring-1 ring-inset ring-sky-500/20",
-    emerald: "bg-emerald-500/10 text-emerald-300 ring-1 ring-inset ring-emerald-500/20",
-    brand: "bg-brand-500/10 text-brand-300 ring-1 ring-inset ring-brand-500/20",
-    violet: "bg-violet-500/10 text-violet-300 ring-1 ring-inset ring-violet-500/20",
+    slate: "bg-white/5 text-slate-300 ring-1 ring-inset ring-white/10 shadow-[0_0_10px_rgba(255,255,255,0.02)]",
+    green: "bg-emerald-500/10 text-emerald-300 ring-1 ring-inset ring-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]",
+    red: "bg-red-500/10 text-red-300 ring-1 ring-inset ring-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.2)]",
+    amber: "bg-amber-500/10 text-amber-300 ring-1 ring-inset ring-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.2)]",
+    blue: "bg-sky-500/10 text-sky-300 ring-1 ring-inset ring-sky-500/20 shadow-[0_0_10px_rgba(14,165,233,0.2)]",
+    emerald: "bg-emerald-500/10 text-emerald-300 ring-1 ring-inset ring-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]",
+    brand: "bg-brand-500/10 text-brand-300 ring-1 ring-inset ring-brand-500/20 shadow-[0_0_10px_rgba(139,92,246,0.2)]",
+    violet: "bg-violet-500/10 text-violet-300 ring-1 ring-inset ring-violet-500/20 shadow-[0_0_10px_rgba(139,92,246,0.2)]",
   };
   return (
     <span
@@ -276,17 +277,31 @@ export function DataTable({
             ))}
           </tr>
         </thead>
-        <tbody>
+        <motion.tbody
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: { transition: { staggerChildren: 0.04 } },
+            hidden: {},
+          }}
+        >
           {rows.map((row) => (
-            <tr key={getRowKey(row)} className="border-t border-white/5 hover:bg-white/[0.02]">
+            <motion.tr 
+              key={getRowKey(row)} 
+              className="border-t border-white/5 hover:bg-white/[0.02]"
+              variants={{
+                hidden: { opacity: 0, y: 10 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+              }}
+            >
               {columns.map((c) => (
                 <td key={c.key} className={cn("py-3 text-slate-300", c.className)}>
                   {c.render ? c.render(row) : row[c.key]}
                 </td>
               ))}
-            </tr>
+            </motion.tr>
           ))}
-        </tbody>
+        </motion.tbody>
       </table>
       {rows.length === 0 && (empty ?? <EmptyState title="No records found" />)}
     </div>

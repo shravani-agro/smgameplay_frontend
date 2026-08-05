@@ -11,6 +11,7 @@ import {
   PageHeader,
   Button,
 } from "@/components/ui";
+import { toast } from "@/components/Toast";
 import { listBids, listMarkets, cancelBet } from "@/lib/admin";
 import type { Bid } from "@/lib/types";
 import { parseApiError } from "@/lib/error-parser";
@@ -61,7 +62,7 @@ export default function BidsPage() {
       await cancelBet(id);
       load(); // refresh
     } catch (e: any) {
-      alert(parseApiError(e, "Failed to cancel bet"));
+      toast.error(parseApiError(e, "Failed to cancel bet"));
     }
   };
 

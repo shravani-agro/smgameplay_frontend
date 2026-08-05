@@ -13,6 +13,7 @@ import {
   PageHeader,
   TimePicker,
 } from "@/components/ui";
+import { toast } from "@/components/Toast";
 import { parseApiError } from "@/lib/error-parser";
 import {
   listMarkets,
@@ -139,7 +140,7 @@ export default function MarketsPage() {
       setEdit(null);
       load();
     } catch (err: any) {
-      alert(err?.response?.data?.detail || "Error saving market");
+      toast.error(err?.response?.data?.detail || "Error saving market");
     }
   }
 
@@ -201,7 +202,7 @@ export default function MarketsPage() {
       setOrderChanged(false);
       load();
     } catch (err: any) {
-      alert("Failed to save reordered markets.");
+      toast.error("Failed to save reordered markets.");
     } finally {
       setIsReordering(false);
     }
@@ -213,7 +214,7 @@ export default function MarketsPage() {
       await updateMarket(market.id, { holiday_status: newStatus });
       setMarkets(markets.map(m => m.id === market.id ? { ...m, holiday_status: newStatus } : m));
     } catch (err: any) {
-      alert("Failed to update holiday status");
+      toast.error("Failed to update holiday status");
     }
   };
 

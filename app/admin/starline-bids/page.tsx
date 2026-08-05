@@ -10,6 +10,7 @@ import {
   PageHeader,
   Button,
 } from "@/components/ui";
+import { toast } from "@/components/Toast";
 import { listStarlineMarkets, getStarlineBidsSummary } from "@/lib/admin";
 import { parseApiError } from "@/lib/error-parser";
 
@@ -104,10 +105,10 @@ export default function StarlineBidDataPage() {
     
     const textToCopy = header + body;
     navigator.clipboard.writeText(textToCopy).then(() => {
-      alert("Copied perfectly formatted Bid Data to clipboard!");
+      toast.success("Copied perfectly formatted Bid Data to clipboard!");
     }).catch((err) => {
       console.error("Could not copy text: ", err);
-      alert("Failed to copy to clipboard.");
+      toast.error("Failed to copy to clipboard.");
     });
   };
 

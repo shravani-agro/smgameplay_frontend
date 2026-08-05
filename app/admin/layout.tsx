@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { Button, Spinner, cn } from "@/components/ui";
+import { ToastContainer } from "@/components/Toast";
+import { CommandPalette } from "@/components/CommandPalette";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: "▦" },
@@ -186,6 +188,8 @@ export default function DashboardLayout({
 
         <main className="flex-1 px-4 py-5 sm:px-6 lg:px-8 lg:py-7">{children}</main>
       </div>
+      <CommandPalette />
+      <ToastContainer />
     </div>
   );
 }

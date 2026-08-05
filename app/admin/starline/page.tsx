@@ -15,6 +15,7 @@ import {
   EmptyState,
   TimePicker,
 } from "@/components/ui";
+import { toast } from "@/components/Toast";
 import { parseApiError } from "@/lib/error-parser";
 import {
   listStarlineMarkets,
@@ -128,7 +129,7 @@ export default function StarlinePage() {
       setEdit(null);
       load();
     } catch (err: any) {
-      alert(err?.response?.data?.detail || "Error saving starline market");
+      toast.error(err?.response?.data?.detail || "Error saving starline market");
     }
   }
 
@@ -177,7 +178,7 @@ export default function StarlinePage() {
       setOrderChanged(false);
       load();
     } catch (err: any) {
-      alert("Failed to save reordered markets.");
+      toast.error("Failed to save reordered markets.");
     } finally {
       setIsReordering(false);
     }
@@ -208,7 +209,7 @@ export default function StarlinePage() {
       await updateStarlineMarket(market.id, { holiday_status: newStatus });
       setMarkets(markets.map(m => m.id === market.id ? { ...m, holiday_status: newStatus } : m));
     } catch (err: any) {
-      alert("Failed to update holiday status");
+      toast.error("Failed to update holiday status");
     }
   };
 
