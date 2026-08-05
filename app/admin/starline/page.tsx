@@ -13,6 +13,7 @@ import {
   ErrorMsg,
   PageHeader,
   EmptyState,
+  TimePicker,
 } from "@/components/ui";
 import { parseApiError } from "@/lib/error-parser";
 import {
@@ -481,7 +482,7 @@ export default function StarlinePage() {
                 {formData.schedules.map((sch, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <Input value={sch.session_label} onChange={(e) => updateSchedule(i, "session_label", e.target.value)} placeholder="Label (e.g. 10 AM)" className="flex-1" />
-                    <Input required type="time" value={sch.result_time} onChange={(e) => updateSchedule(i, "result_time", e.target.value)} className="w-36" />
+                    <TimePicker value={sch.result_time} onChange={(val) => updateSchedule(i, "result_time", val)} className="w-36" />
                     <Button variant="danger" type="button" size="sm" onClick={() => removeSchedule(i)}>
                       Delete
                     </Button>

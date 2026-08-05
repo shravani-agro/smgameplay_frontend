@@ -11,6 +11,7 @@ import {
   Spinner,
   ErrorMsg,
   PageHeader,
+  TimePicker,
 } from "@/components/ui";
 import { parseApiError } from "@/lib/error-parser";
 import {
@@ -338,51 +339,33 @@ export default function MarketsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Open Time</label>
-                      <Select required value={formData.open_time} onChange={(e) => setFormData({ ...formData, open_time: e.target.value })}>
-                        <option value="">Select Time</option>
-                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                      </Select>
+                      <TimePicker value={formData.open_time} onChange={(val) => setFormData({ ...formData, open_time: val })} />
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Close Time</label>
-                      <Select required value={formData.close_time} onChange={(e) => setFormData({ ...formData, close_time: e.target.value })}>
-                        <option value="">Select Time</option>
-                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                      </Select>
+                      <TimePicker value={formData.close_time} onChange={(val) => setFormData({ ...formData, close_time: val })} />
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Open Start Time</label>
-                      <Select value={formData.open_start_time} onChange={(e) => setFormData({ ...formData, open_start_time: e.target.value })}>
-                        <option value="">Select Time</option>
-                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                      </Select>
+                      <TimePicker value={formData.open_start_time} onChange={(val) => setFormData({ ...formData, open_start_time: val })} />
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Open Stop Time</label>
-                      <Select value={formData.open_stop_time} onChange={(e) => setFormData({ ...formData, open_stop_time: e.target.value })}>
-                        <option value="">Select Time</option>
-                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                      </Select>
+                      <TimePicker value={formData.open_stop_time} onChange={(val) => setFormData({ ...formData, open_stop_time: val })} />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Close Start Time</label>
-                      <Select value={formData.close_start_time} onChange={(e) => setFormData({ ...formData, close_start_time: e.target.value })}>
-                        <option value="">Select Time</option>
-                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                      </Select>
+                      <TimePicker value={formData.close_start_time} onChange={(val) => setFormData({ ...formData, close_start_time: val })} />
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-400">Close Stop Time</label>
-                      <Select value={formData.close_stop_time} onChange={(e) => setFormData({ ...formData, close_stop_time: e.target.value })}>
-                        <option value="">Select Time</option>
-                        {TIME_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                      </Select>
+                      <TimePicker value={formData.close_stop_time} onChange={(val) => setFormData({ ...formData, close_stop_time: val })} />
                     </div>
                   </div>
                 </>
@@ -405,7 +388,7 @@ export default function MarketsPage() {
                   {formData.schedules.map((sch, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <Input value={sch.session_label} onChange={(e) => updateSchedule(i, "session_label", e.target.value)} placeholder="Label (e.g. 10 AM)" className="flex-1" />
-                      <Input type="time" required value={sch.result_time} onChange={(e) => updateSchedule(i, "result_time", e.target.value)} placeholder="Time (HH:MM)" className="w-32" />
+                      <TimePicker value={sch.result_time} onChange={(val) => updateSchedule(i, "result_time", val)} className="w-32" />
                       <Button variant="danger" type="button" size="sm" onClick={() => removeSchedule(i)}>
                         Delete
                       </Button>

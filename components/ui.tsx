@@ -407,3 +407,168 @@ export function Tabs({
     </div>
   );
 }
+
+export function TimePickerModal({
+  open,
+  onClose,
+  value,
+  onChange,
+}: {
+  open: boolean;
+  onClose: () => void;
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [mode, setMode] = React.useState<"h" | "m">("h");
+  const [h24, m] = (value || "00:00").split(":").map(Number);
+  const hour24 = isNaN(h24) ? 0 : h24;
+  const minute = isNaN(m) ? 0 : m;
+  
+  const [tempH, setTempH] = React.useState(hour24);
+  const [tempM, setTempM] = React.useState(minute);
+
+  React.useEffect(() => {
+    if (open) {
+      setTempH(isNaN(h24) ? 0 : h24);
+      setTempM(isNaN(m) ? 0 : m);
+      setMode("h");
+    }
+  }, [open, h24, m]);
+
+  if (!open) return null;
+
+  const isPM = tempH >= 12;
+  const displayH = tempH % 12 || 12;
+
+  const handleClockAction = (e: React.PointerEvent<HTMLDivElement>, isDragging = false) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left - 130;
+    const y = e.clientY - rect.top - 130;
+    let angle = (Math.atan2(y, x) * 180) / Math.PI + 90;
+    if (angle < 0) angle += 360;
+
+    if (mode === "h") {
+      let h = Math.round(angle / 30);
+      if (h === 0) h = 12;
+      
+      let newH = isPM ? (h === 12 ? 12 : h + 12) : (h === 12 ? 0 : h);
+      setTempH(newH);
+      if (!isDragging && e.type === "pointerup") {
+         setMode("m");
+      }
+    } else {
+      let m = Math.round(angle / 6) % 60;
+      setTempM(m);
+    }
+  };
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+
+  const numbers = mode === "h" ? [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] : [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+  
+  const handAngle = mode === "h" ? (displayH * 30) : (tempM * 6);
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-[320px] rounded-2xl bg-ink-900 shadow-2xl animate-scale-in overflow-hidden border border-white/10" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-center gap-6 bg-brand-600 p-6">
+           <div className="flex items-baseline gap-1 text-5xl font-light text-white">
+             <span className={cn("cursor-pointer transition-opacity", mode === "h" ? "opacity-100" : "opacity-60 hover:opacity-80")} onClick={() => setMode("h")}>
+               {pad(displayH)}
+             </span>
+             <span className="opacity-60 text-4xl">:</span>
+             <span className={cn("cursor-pointer transition-opacity", mode === "m" ? "opacity-100" : "opacity-60 hover:opacity-80")} onClick={() => setMode("m")}>
+               {pad(tempM)}
+             </span>
+           </div>
+           <div className="flex flex-col gap-1.5 text-sm font-semibold">
+             <button className={cn("rounded-md px-2.5 py-1 transition-colors", !isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} onClick={() => setTempH(tempH >= 12 ? tempH - 12 : tempH)}>AM</button>
+             <button className={cn("rounded-md px-2.5 py-1 transition-colors", isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} onClick={() => setTempH(tempH < 12 ? tempH + 12 : tempH)}>PM</button>
+           </div>
+        </div>
+
+        <div className="flex justify-center p-8 bg-ink-950">
+           <div 
+             className="relative h-[260px] w-[260px] rounded-full bg-white/[0.03] shadow-inner ring-1 ring-white/5"
+             onPointerDown={(e) => {
+               (e.target as HTMLElement).setPointerCapture(e.pointerId);
+               handleClockAction(e, false);
+             }}
+             onPointerMove={(e) => {
+               if (e.buttons > 0) handleClockAction(e, true);
+             }}
+             onPointerUp={(e) => {
+               handleClockAction(e, false);
+             }}
+             style={{ touchAction: "none" }}
+           >
+              <div 
+                className="absolute top-1/2 left-1/2 w-0.5 h-[90px] bg-brand-500 origin-bottom transition-transform duration-200 ease-out"
+                style={{ transform: `translate(-50%, -100%) rotate(${handAngle}deg)` }}
+              >
+                 <div className="absolute -top-4 -left-[14px] h-8 w-8 rounded-full bg-brand-500/20 flex items-center justify-center">
+                    <div className="h-2 w-2 rounded-full bg-brand-500" />
+                 </div>
+                 <div className="absolute bottom-0 -left-1 h-2 w-2 rounded-full bg-brand-500" />
+              </div>
+
+              {numbers.map((n, i) => {
+                const a = ((i * 30 - 90) * Math.PI) / 180;
+                const x = 130 + 105 * Math.cos(a);
+                const y = 130 + 105 * Math.sin(a);
+                const isActive = mode === "h" ? n === displayH || (n===12 && displayH===12) : n === tempM;
+                return (
+                  <div
+                    key={n}
+                    className={cn(
+                      "absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-sm pointer-events-none transition-colors",
+                      isActive ? "text-white font-bold" : "text-slate-400"
+                    )}
+                    style={{ left: x, top: y }}
+                  >
+                    {mode === "h" ? n : pad(n)}
+                  </div>
+                )
+              })}
+           </div>
+        </div>
+
+        <div className="flex justify-end gap-2 p-4 bg-ink-950 border-t border-white/5">
+           <Button variant="ghost" onClick={onClose}>CANCEL</Button>
+           <Button variant="ghost" className="text-brand-400 hover:text-brand-300" onClick={() => {
+              onChange(`${pad(tempH)}:${pad(tempM)}`);
+              onClose();
+           }}>OK</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TimePicker({ value, onChange, className = "" }: { value: string; onChange: (v: string) => void; className?: string }) {
+  const [open, setOpen] = React.useState(false);
+  
+  let displayVal = "--:--";
+  if (value) {
+    const [h, m] = value.split(":").map(Number);
+    if (!isNaN(h) && !isNaN(m)) {
+      const isPM = h >= 12;
+      const dH = h % 12 || 12;
+      displayVal = `${dH.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")} ${isPM ? "PM" : "AM"}`;
+    }
+  }
+  
+  return (
+    <>
+      <div 
+        className={cn("input-base flex items-center justify-between cursor-pointer select-none", className)}
+        onClick={() => setOpen(true)}
+      >
+        <span className={value ? "text-slate-100" : "text-slate-500"}>{displayVal}</span>
+        <span className="text-slate-400">🕒</span>
+      </div>
+      <TimePickerModal open={open} onClose={() => setOpen(false)} value={value} onChange={onChange} />
+    </>
+  );
+}
+
