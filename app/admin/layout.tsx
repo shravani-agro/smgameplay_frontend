@@ -14,6 +14,8 @@ const NAV = [
   { href: "/admin/results", label: "Results", icon: "🎯" },
   { href: "/admin/deposits", label: "Deposits", icon: "➕" },
   { href: "/admin/bids", label: "Bids", icon: "🎲" },
+  { href: "/admin/regular-bids", label: "Regular Bid Data", icon: "📊" },
+  { href: "/admin/starline-bids", label: "Starline Bid Data", icon: "📈" },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: "💸" },
   { href: "/admin/audit", label: "Audit Logs", icon: "🛡" },
   { href: "/admin/settings", label: "Settings", icon: "⚙" },

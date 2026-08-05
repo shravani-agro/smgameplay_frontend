@@ -187,6 +187,11 @@ export async function listBids(params: any = {}) {
   return res.data;
 }
 
+export async function getBidsSummary(params: any = {}) {
+  const res = await client.get("/admin/bids/summary", { params });
+  return res.data;
+}
+
 /* ---------------- Admin: Audit Logs ---------------- */
 
 export async function getAuditLogs(params: any = {}) {
