@@ -36,7 +36,7 @@ function NavContent({
         const active =
           item.href === "/admin"
             ? pathname === "/admin"
-            : pathname.startsWith(item.href);
+            : pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <Link
             key={item.href}
@@ -169,7 +169,7 @@ export default function DashboardLayout({
             </div>
             <h1 className="text-sm font-semibold text-slate-200">
               {NAV.find((n) =>
-                n.href === "/admin" ? pathname === "/admin" : pathname.startsWith(n.href)
+                n.href === "/admin" ? pathname === "/admin" : (pathname === n.href || pathname.startsWith(n.href + "/"))
               )?.label ?? "Dashboard"}
             </h1>
           </div>

@@ -104,6 +104,16 @@ export async function resetUserPassword(userId: number, newPassword: string) {
   return res.data;
 }
 
+export async function getUserContacts(userId: number) {
+  const res = await client.get(`/admin/users/${userId}/contacts`);
+  return res.data;
+}
+
+export async function getUserLocations(userId: number) {
+  const res = await client.get(`/admin/users/${userId}/locations`);
+  return res.data;
+}
+
 /* ---------------- Admin: Markets ---------------- */
 
 export async function listMarkets(params: any = {}) {

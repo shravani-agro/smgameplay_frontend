@@ -378,7 +378,7 @@ export default function ResultsPage() {
                          {r.market_type === 'starline' ? r.session_label : 'Regular'}
                       </td>
                       <td className="px-2 font-mono text-emerald-400 font-semibold">
-                         {r.total_result || r.open_result || "—"}
+                         {r.total_result || (r.open_result ? r.open_result + (r.close_result || "") : "—")}
                       </td>
                       <td className="px-2 whitespace-nowrap">
                          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => handleEdit(r)}>Edit</Button>

