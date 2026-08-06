@@ -52,6 +52,23 @@ export async function getUserGrowth(days = 30) {
   return res.data;
 }
 
+export async function getDepositWithdrawalReport(period = "daily", days = 30) {
+  const res = await client.get("/admin/stats/deposits-withdrawals", {
+    params: { period, days },
+  });
+  return res.data;
+}
+
+export async function getWithdrawalCounts() {
+  const res = await client.get("/admin/withdrawals/counts");
+  return res.data;
+}
+
+export async function getDepositCounts() {
+  const res = await client.get("/admin/deposits/counts");
+  return res.data;
+}
+
 /* ---------------- Admin: Users ---------------- */
 
 export async function listUsers(params: any = {}) {
@@ -186,11 +203,6 @@ export async function bulkApproveWithdrawals(requestIds: number[]) {
 
 export async function listDeposits(params: any = {}) {
   const res = await client.get("/admin/deposits", { params });
-  return res.data;
-}
-
-export async function processDeposit(txnId: string, action: string) {
-  const res = await client.post(`/admin/deposits/${txnId}/${action}`);
   return res.data;
 }
 

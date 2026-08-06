@@ -10,11 +10,11 @@ export default function Home() {
         <Hero />
         <Features />
       </main>
-      
+
       {/* Simple Footer */}
       <footer className="relative mt-24 border-t border-white/10 py-10 text-center bg-black/20 backdrop-blur-md">
         <p className="text-sm font-medium text-slate-500">
-          © {new Date().getFullYear()} SMGameplay. All rights reserved.
+          © {new Date().getFullYear()} SMGameplay Booking. All rights reserved.
         </p>
       </footer>
     </div>

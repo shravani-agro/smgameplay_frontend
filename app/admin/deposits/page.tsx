@@ -4,24 +4,35 @@ import React, { useEffect, useState, useCallback } from "react";
 import { format } from "date-fns";
 import {
   Card,
-  Button,
-  Select,
   Badge,
   Spinner,
   ErrorMsg,
   PageHeader,
-  Modal,
   Input,
+  EmptyState,
 } from "@/components/ui";
-import { listDeposits, processDeposit } from "@/lib/admin";
+import { listDeposits, getDepositCounts } from "@/lib/admin";
 import type { DepositRequest } from "@/lib/types";
+import { fmtMoney } from "@/lib/format";
 import { parseApiError } from "@/lib/error-parser";
 
-const STATUSES = ["pending", "completed", "rejected"];
+const STATUSES: { id: string; label: string; color: string }[] = [
+  { id: "", label: "All", color: "slate" },
+  { id: "pending", label: "Pending", color: "amber" },
+  { id: "completed", label: "Completed", color: "emerald" },
+  { id: "rejected", label: "Rejected", color: "red" },
+];
+
 const statusColor: Record<string, any> = {
   pending: "amber",
-  completed: "green",
+  completed: "emerald",
   rejected: "red",
+};
+
+const statusDot: Record<string, string> = {
+  pending: "bg-amber-400",
+  completed: "bg-emerald-400",
+  rejected: "bg-red-400",
 };
 
 export default function DepositsPage() {
@@ -29,9 +40,9 @@ export default function DepositsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState("");
+  const [counts, setCounts] = useState<any>({ pending: 0, completed: 0, rejected: 0, total: 0 });
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [confirm, setConfirm] = useState<{ txn: string; action: string } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -41,12 +52,13 @@ export default function DepositsPage() {
       if (status) params.status = status;
       if (dateFrom) params.date_from = new Date(dateFrom).toISOString();
       if (dateTo) {
-         // set dateTo to end of day to include the full day
-         const dt = new Date(dateTo);
-         dt.setHours(23, 59, 59, 999);
-         params.date_to = dt.toISOString();
+        const dt = new Date(dateTo);
+        dt.setHours(23, 59, 59, 999);
+        params.date_to = dt.toISOString();
       }
-      setItems(await listDeposits(params));
+      const [data, c] = await Promise.all([listDeposits(params), getDepositCounts()]);
+      setItems(data);
+      setCounts(c);
     } catch (e: any) {
       setError(parseApiError(e, "Failed to load deposits"));
     } finally {
@@ -58,106 +70,112 @@ export default function DepositsPage() {
     load();
   }, [load]);
 
-  function openConfirm(txn: string, action: string) {
-    setConfirm({ txn, action });
-  }
-
-  async function doProcess() {
-    if (!confirm) return;
-    try {
-      await processDeposit(confirm.txn, confirm.action);
-      setConfirm(null);
-      load();
-    } catch (e: any) {
-      setError(parseApiError(e, "Failed to process deposit"));
-    }
-  }
+  const totalAmount = items.reduce((sum, d) => sum + Number(d.amount || 0), 0);
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Deposits"
-        description="Approve or reject user deposit requests"
+        description="Deposits are auto-confirmed when payment is received — no manual approval needed"
         actions={
           <div className="flex flex-wrap gap-2 items-center">
-            <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-36 h-9 text-xs" />
+            <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-36 h-9 text-xs" />
             <span className="text-slate-400">to</span>
-            <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-36 h-9 text-xs" />
-            <Select value={status} onChange={(e) => setStatus(e.target.value)} className="w-36 h-9 text-xs">
-              <option value="">All statuses</option>
-              {STATUSES.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </Select>
+            <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-36 h-9 text-xs" />
           </div>
         }
       />
       <ErrorMsg msg={error} />
 
-      <Card title={`${items.length} requests`} bodyClassName="p-0">
+      <div className="flex flex-wrap gap-1.5 overflow-x-auto no-scrollbar">
+        {STATUSES.map((s) => {
+          const active = status === s.id;
+          const count = s.id === "" ? counts.total : (counts[s.id] ?? 0);
+          return (
+            <button
+              key={s.id || "all"}
+              onClick={() => setStatus(s.id)}
+              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all whitespace-nowrap ${
+                active
+                  ? "bg-brand-600 text-white shadow-glow"
+                  : "border border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/20 hover:text-slate-200"
+              }`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-white/80" : statusDot[s.id] ?? "bg-slate-500"}`} />
+              {s.label}
+              <span className={`rounded-full px-1.5 text-[10px] font-bold ${active ? "bg-white/20 text-white" : "bg-white/10 text-slate-400"}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <Card
+        title={`${items.length} deposits`}
+        subtitle={`Total: ${fmtMoney(totalAmount)}`}
+        bodyClassName="p-0"
+      >
         {loading ? (
           <div className="p-4"><Spinner /></div>
         ) : (
-          <div className="table-wrap">
-            <table className="w-full min-w-[820px] text-sm">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
-                  <th>Txn ID</th>
-                  <th>User</th>
-                  <th>Method</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Created</th>
-                  <th className="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((d) => (
-                  <tr key={d.id} className="border-t border-white/5 hover:bg-white/[0.02]">
-                    <td className="py-3 font-medium text-slate-100">{d.txn_id}</td>
-                    <td className="text-slate-500">{d.user_id}</td>
-                    <td className="text-slate-400">{d.method}</td>
-                    <td>{Number(d.amount).toFixed(2)}</td>
-                    <td>
-                      <Badge color={statusColor[d.status] ?? "slate"}>{d.status}</Badge>
-                    </td>
-                    <td className="text-slate-400">
-                      {format(new Date(d.created_at), "dd/MM/yyyy hh:mm a")}
-                    </td>
-                    <td>
-                      <div className="flex flex-wrap justify-end gap-1.5">
-                        <Button size="sm" variant="success" disabled={d.status !== "pending"} onClick={() => openConfirm(d.txn_id, "approve")}>
-                          Approve
-                        </Button>
-                        <Button size="sm" variant="danger" disabled={d.status !== "pending"} onClick={() => openConfirm(d.txn_id, "reject")}>
-                          Reject
-                        </Button>
-                      </div>
-                    </td>
+          <div>
+            <div className="table-wrap hidden md:block">
+              <table className="w-full min-w-[820px] text-sm">
+                <thead>
+                  <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                    <th>Txn ID</th>
+                    <th>User</th>
+                    <th>Method</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Created</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {items.map((d) => (
+                    <tr key={d.id} className="border-t border-white/5 transition-colors hover:bg-white/[0.03]">
+                      <td className="py-3 font-medium text-slate-100">{d.txn_id}</td>
+                      <td className="text-slate-500">#{d.user_id}</td>
+                      <td className="text-slate-400">
+                        <Badge color="slate">{d.method}</Badge>
+                      </td>
+                      <td className="font-semibold text-emerald-400">{fmtMoney(d.amount)}</td>
+                      <td>
+                        <Badge color={statusColor[d.status] ?? "slate"}>{d.status}</Badge>
+                      </td>
+                      <td className="text-slate-400">
+                        {format(new Date(d.created_at), "dd/MM/yyyy hh:mm a")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {items.length === 0 && <EmptyState title="No deposits found" hint="Try changing the status filter or date range" />}
+            </div>
+            <div className="space-y-2.5 p-2 md:hidden">
+              {items.map((d) => (
+                <div key={d.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-mono text-sm font-semibold text-slate-100">{d.txn_id}</p>
+                      <p className="mt-0.5 text-xs text-slate-500">User #{d.user_id} · {d.method}</p>
+                    </div>
+                    <Badge color={statusColor[d.status] ?? "slate"}>{d.status}</Badge>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-slate-500">
+                      {format(new Date(d.created_at), "dd/MM/yyyy hh:mm a")}
+                    </span>
+                    <span className="text-lg font-bold text-emerald-400">{fmtMoney(d.amount)}</span>
+                  </div>
+                </div>
+              ))}
+              {items.length === 0 && <EmptyState title="No deposits found" hint="Try changing the status filter or date range" />}
+            </div>
           </div>
         )}
       </Card>
-
-      <Modal
-        open={!!confirm}
-        onClose={() => setConfirm(null)}
-        title={`${confirm?.action === "approve" ? "Approve" : "Reject"} deposit`}
-      >
-        <p className="text-sm text-slate-300">
-          Are you sure you want to <b>{confirm?.action}</b> deposit {confirm?.txn}?
-          {confirm?.action === "approve" && " This will credit the user's wallet."}
-        </p>
-        <div className="mt-5 flex justify-end gap-2">
-          <Button variant="ghost" onClick={() => setConfirm(null)}>Cancel</Button>
-          <Button variant={confirm?.action === "reject" ? "danger" : "success"} onClick={doProcess}>
-            Confirm
-          </Button>
-        </div>
-      </Modal>
     </div>
   );
 }

@@ -1,15 +1,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, Select, Spinner, ErrorMsg, StatCard, PageHeader, Badge, DataTable } from "@/components/ui";
+import { Card, Select, Spinner, ErrorMsg, StatCard, PageHeader } from "@/components/ui";
 import { motion } from "framer-motion";
 import {
   getOverviewStats,
-  getRevenueReport,
   getMarketSummaries,
   getTopBettors,
   getUserGrowth,
+  getDepositWithdrawalReport,
 } from "@/lib/admin";
+import { fmtMoney, fmtNum } from "@/lib/format";
 import { parseApiError } from "@/lib/error-parser";
 import {
   BarChart,
@@ -21,13 +22,8 @@ import {
   AreaChart,
   Area,
   CartesianGrid,
-  Cell,
+  Legend,
 } from "recharts";
-
-const fmt = (n: any) => {
-  if (n === undefined || n === null) return "—";
-  return Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 });
-};
 
 const tooltipStyle = {
   background: "rgba(4, 6, 11, 0.8)",
@@ -41,10 +37,10 @@ const tooltipStyle = {
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null);
-  const [revenue, setRevenue] = useState<any[]>([]);
   const [markets, setMarkets] = useState<any[]>([]);
   const [topBettors, setTopBettors] = useState<any[]>([]);
   const [growth, setGrowth] = useState<any[]>([]);
+  const [depWit, setDepWit] = useState<any[]>([]);
   const [period, setPeriod] = useState("daily");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,18 +49,18 @@ export default function DashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const [s, r, m, t, g] = await Promise.all([
+      const [s, m, t, g, dw] = await Promise.all([
         getOverviewStats(),
-        getRevenueReport(period),
         getMarketSummaries(),
         getTopBettors(5),
         getUserGrowth(30),
+        getDepositWithdrawalReport(period, 30),
       ]);
       setStats(s);
-      setRevenue(Array.isArray(r) ? r : []);
       setMarkets(m);
       setTopBettors(t);
       setGrowth(g);
+      setDepWit(Array.isArray(dw) ? dw : []);
     } catch (e: any) {
       setError(parseApiError(e, "Failed to load dashboard"));
     } finally {
@@ -83,11 +79,11 @@ export default function DashboardPage() {
     { label: "Total Users", value: stats?.total_users, icon: "👥", accent: "sky" as const },
     { label: "Active (24h)", value: stats?.active_users_24h, icon: "⚡", accent: "emerald" as const },
     { label: "Bets Today", value: stats?.total_bets_today, icon: "🎯", accent: "violet" as const },
-    { label: "Revenue", value: fmt(stats?.total_revenue), icon: "💰", accent: "brand" as const },
-    { label: "Deposits", value: fmt(stats?.total_deposits), icon: "⬇", accent: "emerald" as const },
-    { label: "Withdrawals", value: fmt(stats?.total_withdrawals), icon: "⬆", accent: "amber" as const },
+    { label: "Revenue", value: fmtMoney(stats?.total_revenue), icon: "💰", accent: "brand" as const },
+    { label: "Deposits", value: fmtMoney(stats?.total_deposits), icon: "⬇", accent: "emerald" as const },
+    { label: "Withdrawals", value: fmtMoney(stats?.total_withdrawals), icon: "⬆", accent: "amber" as const },
     { label: "Pending Withdrawals", value: stats?.pending_withdrawals, icon: "⏳", accent: "amber" as const },
-    { label: "Net P/L", value: fmt(stats?.net_pl), icon: "📊", accent: "violet" as const },
+    { label: "Net P/L", value: fmtMoney(stats?.net_pl), icon: "📊", accent: "violet" as const },
   ];
 
   return (
@@ -135,11 +131,15 @@ export default function DashboardPage() {
         transition={{ duration: 0.5, delay: 0.4 }}
         className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2"
       >
-        <Card title="Revenue Report" subtitle={`Grouped by ${period}`}>
+        <Card title="Deposits vs Withdrawals" subtitle={`Last 30 days, grouped by ${period}`}>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={revenue}>
+            <BarChart data={depWit}>
               <defs>
-                <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="dep" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="#065f46" />
+                </linearGradient>
+                <linearGradient id="wit" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#f43f5e" />
                   <stop offset="100%" stopColor="#9f1239" />
                 </linearGradient>
@@ -147,8 +147,10 @@ export default function DashboardPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="period" stroke="#64748b" fontSize={12} tickLine={false} />
               <YAxis stroke="#64748b" fontSize={12} tickLine={false} />
-              <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: "#f43f5e" }} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
-              <Bar dataKey="amount" fill="url(#rev)" radius={[6, 6, 0, 0]} maxBarSize={48} animationDuration={1500} />
+              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: "#94a3b8" }} />
+              <Bar dataKey="deposits" name="Deposits" fill="url(#dep)" radius={[6, 6, 0, 0]} maxBarSize={24} animationDuration={1500} />
+              <Bar dataKey="withdrawals" name="Withdrawals" fill="url(#wit)" radius={[6, 6, 0, 0]} maxBarSize={24} animationDuration={1500} />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -179,37 +181,90 @@ export default function DashboardPage() {
         className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2"
       >
         <Card title="Top Bettors" subtitle="Highest net profit/loss">
-          <DataTable
-            getRowKey={(b) => b.user_id}
-            rows={topBettors}
-            columns={[
-              { key: "username", header: "User", render: (b) => <span className="font-medium text-slate-100">{b.username}</span> },
-              { key: "wagered", header: "Wagered", render: (b) => fmt(b.total_wagered) },
-              { key: "won", header: "Won", render: (b) => fmt(b.total_won) },
-              {
-                key: "net", header: "Net P/L", render: (b) => (
-                  <span className={b.net_pl >= 0 ? "text-emerald-400" : "text-red-400"}>{fmt(b.net_pl)}</span>
-                ),
-              },
-            ]}
-          />
+          <div className="table-wrap">
+            <table className="w-full min-w-[560px] text-sm">
+              <thead>
+                <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                  <th className="py-2.5 font-medium">User</th>
+                  <th className="py-2.5 font-medium">Wagered</th>
+                  <th className="py-2.5 font-medium">Won</th>
+                  <th className="py-2.5 font-medium">Net P/L</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topBettors.map((b) => (
+                  <tr key={b.user_id} className="border-t border-white/5 transition-colors hover:bg-white/[0.03]">
+                    <td className="py-3 font-medium text-slate-100">
+                      {b.username}
+                      <span className="ml-1.5 text-xs text-slate-500">#{b.user_id}</span>
+                    </td>
+                    <td className="py-3 text-slate-300">{fmtMoney(b.total_wagered)}</td>
+                    <td className="py-3 text-slate-300">{fmtMoney(b.total_won)}</td>
+                    <td className={`py-3 font-medium ${b.net_pl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      {b.net_pl >= 0 ? "+" : ""}{fmtMoney(b.net_pl)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {topBettors.length === 0 && <p className="py-8 text-center text-sm text-slate-500">No betting activity yet</p>}
+          </div>
         </Card>
 
-        <Card title="Market Performance" subtitle="Top markets by activity">
-          <DataTable
-            getRowKey={(m) => m.market_id}
-            rows={markets.slice(0, 8)}
-            columns={[
-              { key: "name", header: "Market", render: (m) => <span className="font-medium text-slate-100">{m.market_name}</span> },
-              { key: "bets", header: "Bets", render: (m) => m.total_bets },
-              { key: "stakes", header: "Stakes", render: (m) => fmt(m.total_stakes) },
-              {
-                key: "net", header: "Net P/L", render: (m) => (
-                  <span className={m.net_pl >= 0 ? "text-emerald-400" : "text-red-400"}>{fmt(m.net_pl)}</span>
-                ),
-              },
-            ]}
-          />
+        <Card title="Market Leaderboard" subtitle="Top markets by total stakes">
+          <div className="space-y-3">
+            {markets.slice(0, 8).map((m, i) => {
+              const maxStakes = Math.max(...markets.slice(0, 8).map((x) => x.total_stakes), 1);
+              const pct = (m.total_stakes / maxStakes) * 100;
+              const rankColors = [
+                "from-amber-400 to-yellow-600 shadow-amber-500/40",
+                "from-slate-300 to-slate-500 shadow-slate-400/30",
+                "from-orange-400 to-amber-700 shadow-orange-500/40",
+                "from-white/15 to-white/5 shadow-white/10",
+              ];
+              return (
+                <div
+                  key={m.market_id}
+                  className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5 transition-colors hover:border-white/20 hover:bg-white/[0.04]"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-sm font-bold text-ink-950 shadow-lg ${
+                          rankColors[Math.min(i, 3)]
+                        }`}
+                      >
+                        {i + 1}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-slate-100">{m.market_name}</p>
+                        <p className="text-xs text-slate-500">
+                          {fmtNum(m.total_bets)} bets · {fmtMoney(m.total_payouts)} paid out
+                        </p>
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-sm font-bold text-slate-100">{fmtMoney(m.total_stakes)}</p>
+                      <p className={`text-xs font-medium ${m.net_pl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                        {m.net_pl >= 0 ? "+" : ""}{fmtMoney(m.net_pl)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/5">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.8, delay: i * 0.06, ease: "easeOut" }}
+                      className={`h-full rounded-full bg-gradient-to-r ${
+                        m.net_pl >= 0 ? "from-emerald-500 to-emerald-400" : "from-red-500 to-red-400"
+                      }`}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            {markets.length === 0 && <p className="py-8 text-center text-sm text-slate-500">No market data yet</p>}
+          </div>
         </Card>
       </motion.div>
       </div>

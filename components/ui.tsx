@@ -259,51 +259,156 @@ export function DataTable({
   rows,
   getRowKey,
   empty,
+  selectable = false,
+  selectedKeys = [],
+  onToggleSelect,
+  onSelectAll,
+  onRowClick,
+  responsive = false,
 }: {
   columns: { key: string; header: React.ReactNode; className?: string; render?: (row: any) => React.ReactNode }[];
   rows: any[];
   getRowKey: (row: any) => React.Key;
   empty?: React.ReactNode;
+  selectable?: boolean;
+  selectedKeys?: React.Key[];
+  onToggleSelect?: (key: React.Key) => void;
+  onSelectAll?: (checked: boolean) => void;
+  onRowClick?: (row: any) => void;
+  responsive?: boolean;
 }) {
-  return (
-    <div className="table-wrap">
-      <table className="w-full min-w-[640px] text-sm">
-        <thead>
-          <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+  const allSelected = rows.length > 0 && rows.every((r) => selectedKeys.includes(getRowKey(r)));
+  const renderRow = (row: any) => (
+    <>
+      {selectable && onToggleSelect && (
+        <td
+          className={cn("py-3 w-10", onRowClick && "pointer-events-none")}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            className="accent-brand-600"
+            checked={selectedKeys.includes(getRowKey(row))}
+            onChange={() => onToggleSelect(getRowKey(row))}
+          />
+        </td>
+      )}
+      {columns.map((c) => (
+        <td key={c.key} className={cn("py-3 text-slate-300", c.className)}>
+          {c.render ? c.render(row) : row[c.key]}
+        </td>
+      ))}
+    </>
+  );
+
+  const renderMobileCard = (row: any) => {
+    const key = getRowKey(row);
+    const isSelected = selectedKeys.includes(key);
+    return (
+      <motion.div
+        key={key}
+        variants={{
+          hidden: { opacity: 0, y: 10 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+        }}
+        onClick={() => (onRowClick ? onRowClick(row) : undefined)}
+        className={cn(
+          "rounded-xl border border-white/10 bg-white/[0.02] p-3.5 transition-colors",
+          isSelected ? "border-brand-500/50 bg-brand-500/[0.06]" : "hover:border-white/20 hover:bg-white/[0.04]",
+          onRowClick && "cursor-pointer"
+        )}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 space-y-1.5">
             {columns.map((c) => (
-              <th key={c.key} className={cn("whitespace-nowrap py-2.5 font-medium", c.className)}>
-                {c.header}
-              </th>
+              <div key={c.key} className="flex items-center justify-between gap-3">
+                <span className="shrink-0 text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  {c.header}
+                </span>
+                <span className="truncate text-right text-sm text-slate-200">
+                  {c.render ? c.render(row) : row[c.key]}
+                </span>
+              </div>
             ))}
-          </tr>
-        </thead>
-        <motion.tbody
-          initial="hidden"
-          animate="visible"
+          </div>
+          {selectable && onToggleSelect && (
+            <input
+              type="checkbox"
+              className="accent-brand-600 mt-0.5 shrink-0"
+              checked={isSelected}
+              onClick={(e) => e.stopPropagation()}
+              onChange={() => onToggleSelect(key)}
+            />
+          )}
+        </div>
+      </motion.div>
+    );
+  };
+
+  const tableBody = (
+    <motion.tbody
+      initial="hidden"
+      animate="visible"
+      variants={{
+        visible: { transition: { staggerChildren: 0.04 } },
+        hidden: {},
+      }}
+    >
+      {rows.map((row) => (
+        <motion.tr
+          key={getRowKey(row)}
+          onClick={onRowClick ? () => onRowClick(row) : undefined}
+          className={cn(
+            "border-t border-white/5 transition-colors",
+            selectedKeys.includes(getRowKey(row))
+              ? "bg-brand-500/[0.07]"
+              : "hover:bg-white/[0.03]",
+            onRowClick && "cursor-pointer"
+          )}
           variants={{
-            visible: { transition: { staggerChildren: 0.04 } },
-            hidden: {},
+            hidden: { opacity: 0, y: 10 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
           }}
         >
-          {rows.map((row) => (
-            <motion.tr 
-              key={getRowKey(row)} 
-              className="border-t border-white/5 hover:bg-white/[0.02]"
-              variants={{
-                hidden: { opacity: 0, y: 10 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
-              }}
-            >
+          {renderRow(row)}
+        </motion.tr>
+      ))}
+    </motion.tbody>
+  );
+
+  return (
+    <div>
+      <div className={cn("table-wrap", responsive && "hidden md:block")}>
+        <table className="w-full min-w-[640px] text-sm">
+          <thead>
+            <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+              {selectable && onSelectAll && (
+                <th className="whitespace-nowrap py-2.5 font-medium w-10">
+                  <input
+                    type="checkbox"
+                    className="accent-brand-600"
+                    checked={allSelected}
+                    onChange={(e) => onSelectAll(e.target.checked)}
+                  />
+                </th>
+              )}
               {columns.map((c) => (
-                <td key={c.key} className={cn("py-3 text-slate-300", c.className)}>
-                  {c.render ? c.render(row) : row[c.key]}
-                </td>
+                <th key={c.key} className={cn("whitespace-nowrap py-2.5 font-medium", c.className)}>
+                  {c.header}
+                </th>
               ))}
-            </motion.tr>
-          ))}
-        </motion.tbody>
-      </table>
-      {rows.length === 0 && (empty ?? <EmptyState title="No records found" />)}
+            </tr>
+          </thead>
+          {tableBody}
+        </table>
+        {rows.length === 0 && (empty ?? <EmptyState title="No records found" />)}
+      </div>
+      {responsive && (
+        <div className="space-y-2.5 p-2 md:hidden">
+          {rows.map(renderMobileCard)}
+          {rows.length === 0 && (empty ?? <EmptyState title="No records found" />)}
+        </div>
+      )}
     </div>
   );
 }

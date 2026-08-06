@@ -34,7 +34,7 @@ export default function Features() {
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8 z-10">
         <div className="mx-auto max-w-2xl text-center">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -42,7 +42,7 @@ export default function Features() {
           >
             Play Smarter
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -51,17 +51,17 @@ export default function Features() {
           >
             Everything you need to <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">win big</span>
           </motion.p>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg leading-8 text-slate-400"
           >
-            Join thousands of players who trust SMGameplay for their daily entertainment and rewards.
+            Join thousands of players who trust SMGameplay Booking for their daily entertainment and rewards.
           </motion.p>
         </div>
-        
+
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
           <dl className="grid max-w-xl grid-cols-1 gap-6 lg:max-w-none lg:grid-cols-4">
             {features.map((feature, index) => (
@@ -75,7 +75,7 @@ export default function Features() {
               >
                 {/* Glow effect on hover */}
                 <div className="absolute inset-0 bg-gradient-to-b from-brand-500/0 to-brand-500/0 group-hover:from-brand-500/5 group-hover:to-transparent transition-all duration-500" />
-                
+
                 <div>
                   <dt className="flex flex-col gap-y-4">
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600/20 ring-1 ring-brand-500/30 group-hover:ring-brand-400 group-hover:bg-brand-500/30 transition-all shadow-[0_0_15px_rgba(225,29,72,0.2)]">

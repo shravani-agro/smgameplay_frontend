@@ -32,11 +32,25 @@ import {
   getUserLocations,
 } from "@/lib/admin";
 import { parseApiError } from "@/lib/error-parser";
+import { fmtMoney, fmtNum, fmtDate } from "@/lib/format";
+import { toast } from "@/components/Toast";
 
-const fmt = (n: any) => {
-  if (n === undefined || n === null) return "—";
-  return Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-};
+function BalanceChip({ balance }: { balance: number }) {
+  const value = Number(balance || 0);
+  const positive = value >= 0;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-mono text-xs font-bold ring-1 ring-inset ${
+        positive
+          ? "bg-emerald-500/10 text-emerald-300 ring-emerald-500/25"
+          : "bg-red-500/10 text-red-300 ring-red-500/25"
+      }`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${positive ? "bg-emerald-400" : "bg-red-400"}`} />
+      ₹{value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+    </span>
+  );
+}
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -60,8 +74,6 @@ export default function UsersPage() {
   const [bonusDesc, setBonusDesc] = useState("Bonus credited");
   const [resetUser, setResetUser] = useState<any>(null);
   const [resetPw, setResetPw] = useState("");
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [actionMsg, setActionMsg] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -118,10 +130,11 @@ export default function UsersPage() {
 
   async function handleToggle(user: any) {
     try {
-      await toggleUserActive(user.id);
+      const res = await toggleUserActive(user.id);
+      toast.success(`User ${res.is_active ? "enabled" : "disabled"}`);
       load();
     } catch (e: any) {
-      setError(parseApiError(e, "Failed to toggle user status"));
+      toast.error(parseApiError(e, "Failed to toggle user status"));
     }
   }
 
@@ -130,13 +143,13 @@ export default function UsersPage() {
     try {
       await addUserBonus(bonusUser.id, parseFloat(bonusAmount), bonusDesc);
       setBonusUser(null);
-      setActionMsg("Bonus credited successfully");
+      toast.success(`Bonus of ₹${fmtNum(bonusAmount)} credited to ${bonusUser.username}`);
       load();
       if (selected && selected.id === bonusUser.id) {
           openDetail(selected); // refresh details if open
       }
     } catch (e: any) {
-      setError(parseApiError(e, "Failed to credit bonus"));
+      toast.error(parseApiError(e, "Failed to credit bonus"));
     }
   }
 
@@ -147,17 +160,16 @@ export default function UsersPage() {
   async function submitDeduct() {
     if (!deductUser) return;
     try {
-      // Need to import deductUserFunds from "@/lib/admin" first
       const { deductUserFunds } = await import("@/lib/admin");
       await deductUserFunds(deductUser.id, parseFloat(deductAmount), deductDesc);
       setDeductUser(null);
-      setActionMsg("Funds deducted successfully");
+      toast.success(`₹${fmtNum(deductAmount)} deducted from ${deductUser.username}`);
       load();
       if (selected && selected.id === deductUser.id) {
           openDetail(selected);
       }
     } catch (e: any) {
-      setError(parseApiError(e, "Failed to deduct funds"));
+      toast.error(parseApiError(e, "Failed to deduct funds"));
     }
   }
 
@@ -167,9 +179,9 @@ export default function UsersPage() {
       await resetUserPassword(resetUser.id, resetPw);
       setResetUser(null);
       setResetPw("");
-      setActionMsg("Password reset successfully");
+      toast.success("Password reset successfully");
     } catch (e: any) {
-      setActionError(parseApiError(e, "Failed to reset password"));
+      toast.error(parseApiError(e, "Failed to reset password"));
     }
   }
 
@@ -186,11 +198,6 @@ export default function UsersPage() {
       <PageHeader title="Users" description="Manage accounts, balances and access" />
 
       <ErrorMsg msg={error} />
-      {actionMsg && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-300">
-          {actionMsg}
-        </div>
-      )}
 
       <Card>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -240,7 +247,7 @@ export default function UsersPage() {
                 ),
               },
               { key: "phone", header: "Phone" },
-              { key: "balance", header: "Balance", render: (u) => fmt(u.wallet_balance) },
+              { key: "balance", header: "Balance", render: (u) => <BalanceChip balance={u.wallet_balance} /> },
               {
                 key: "status",
                 header: "Status",
@@ -280,28 +287,112 @@ export default function UsersPage() {
               <div className="animate-fade-in mt-4">
                 {activeTab === "overview" && (
                   <div className="space-y-6">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                       <Card bodyClassName="p-4 flex flex-col items-center text-center">
-                        <span className="text-xs text-slate-500 uppercase">Balance</span>
-                        <span className="text-xl font-bold text-emerald-400">₹{fmt(selected.wallet_balance)}</span>
+                        <span className="text-xs text-slate-500 uppercase">Wallet Balance</span>
+                        <span className={`mt-1 text-2xl font-bold ${selected.wallet_balance >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                          {fmtMoney(selected.wallet_balance)}
+                        </span>
+                        <span className="mt-1 text-[11px] text-slate-500">Joined {fmtDate(selected.created_at)}</span>
                       </Card>
                       <Card bodyClassName="p-4 flex flex-col items-center text-center">
                         <span className="text-xs text-slate-500 uppercase">Status</span>
-                        <Badge color={selected.is_active ? "emerald" : "red"} className="mt-1">{selected.is_active ? "Active" : "Inactive"}</Badge>
+                        <Badge color={selected.is_active ? "emerald" : "red"} className="mt-2">{selected.is_active ? "Active" : "Inactive"}</Badge>
+                        <span className="mt-1 text-[11px] text-slate-500">ID #{selected.id}</span>
                       </Card>
                       <Card bodyClassName="p-4 flex flex-col items-center text-center">
                         <span className="text-xs text-slate-500 uppercase">Role</span>
-                        <Badge color={selected.username === "admin" ? "brand" : "slate"} className="mt-1">{selected.username === "admin" ? "Owner" : "User"}</Badge>
+                        <Badge color={selected.username === "admin" ? "brand" : "slate"} className="mt-2">{selected.username === "admin" ? "Owner" : "User"}</Badge>
+                        <span className="mt-1 text-[11px] text-slate-500">{selected.phone}</span>
                       </Card>
                     </div>
 
                     {detail && (
-                      <Card title="Activity Summary">
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-                          <Field label="Total Bets" value={detail.total_bets} />
-                          <Field label="Total Wins" value={`₹${fmt(detail.total_wins)}`} />
-                          <Field label="Total Deposits" value={`₹${fmt(detail.total_deposits)}`} />
-                          <Field label="Total Withdrawals" value={`₹${fmt(detail.total_withdrawals)}`} />
+                      <>
+                        <Card title="Wallet Summary" bodyClassName="p-0">
+                          <div className="grid grid-cols-2 gap-px bg-white/5 md:grid-cols-4">
+                            {[
+                              { label: "Lifetime Deposits", value: fmtMoney(detail.total_deposits), tone: "text-emerald-400" },
+                              { label: "Lifetime Withdrawals", value: fmtMoney(detail.total_withdrawals), tone: "text-red-400" },
+                              { label: "Net Deposits", value: fmtMoney((detail.total_deposits ?? 0) - (detail.total_withdrawals ?? 0)), tone: "text-slate-100" },
+                              { label: "Total Wins", value: fmtMoney(detail.total_wins), tone: "text-emerald-400" },
+                            ].map((s) => (
+                              <div key={s.label} className="bg-ink-900 p-4">
+                                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{s.label}</p>
+                                <p className={`mt-1 text-lg font-bold ${s.tone}`}>{s.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </Card>
+
+                        <Card title="Activity Summary">
+                          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
+                            <Field label="Total Bets" value={fmtNum(detail.total_bets)} />
+                            <Field label="Total Wins (count)" value={fmtNum(detail.total_wins_count ?? "—")} />
+                            <Field label="Deposits" value={fmtMoney(detail.total_deposits)} />
+                            <Field label="Withdrawals" value={fmtMoney(detail.total_withdrawals)} />
+                          </div>
+                        </Card>
+                      </>
+                    )}
+
+                    {(userBids.length > 0 || userDeposits.length > 0 || userWithdrawals.length > 0) && (
+                      <Card title="Recent Activity" bodyClassName="p-0">
+                        <div className="max-h-80 overflow-y-auto">
+                          {[
+                            ...userDeposits.map((d) => ({
+                              key: `dep-${d.id}`,
+                              type: "Deposit",
+                              amount: Number(d.amount || 0),
+                              status: d.status,
+                              date: d.created_at,
+                            })),
+                            ...userWithdrawals.map((w) => ({
+                              key: `wit-${w.id}`,
+                              type: "Withdrawal",
+                              amount: -Number(w.amount || 0),
+                              status: w.status,
+                              date: w.requested_at || w.created_at,
+                            })),
+                            ...userBids.map((b) => ({
+                              key: `bid-${b.id}`,
+                              type: "Bet",
+                              amount: -Number(b.amount || 0),
+                              status: b.status,
+                              date: b.created_at || b.placed_at,
+                            })),
+                          ]
+                            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                            .slice(0, 15)
+                            .map((a) => (
+                              <div key={a.key} className="flex items-center justify-between border-b border-white/5 px-4 py-2.5 last:border-0">
+                                <div className="flex items-center gap-3">
+                                  <div
+                                    className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold ${
+                                      a.type === "Deposit"
+                                        ? "bg-emerald-500/15 text-emerald-400"
+                                        : a.type === "Withdrawal"
+                                        ? "bg-red-500/15 text-red-400"
+                                        : "bg-violet-500/15 text-violet-400"
+                                    }`}
+                                  >
+                                    {a.type === "Deposit" ? "D" : a.type === "Withdrawal" ? "W" : "B"}
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-slate-200">{a.type}</p>
+                                    <p className="text-[11px] text-slate-500">{fmtDate(a.date)}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-sm font-semibold ${a.amount >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                                    {a.amount >= 0 ? "+" : ""}{fmtMoney(a.amount)}
+                                  </span>
+                                  <Badge color={a.status === "completed" || a.status === "won" || a.status === "approved" ? "emerald" : a.status === "rejected" || a.status === "lost" ? "red" : "amber"}>
+                                    {a.status}
+                                  </Badge>
+                                </div>
+                              </div>
+                            ))}
                         </div>
                       </Card>
                     )}
@@ -317,7 +408,7 @@ export default function UsersPage() {
                         { key: "market", header: "Market", render: (b) => b.market_name },
                         { key: "type", header: "Type", render: (b) => b.bet_type },
                         { key: "number", header: "Number", render: (b) => <span className="font-bold text-slate-200">{b.selected_number}</span> },
-                        { key: "points", header: "Points", render: (b) => fmt(b.amount) },
+                        { key: "points", header: "Points", render: (b) => fmtMoney(b.amount) },
                         { key: "status", header: "Status", render: (b) => (
                            <Badge color={b.status === "won" ? "emerald" : b.status === "lost" ? "red" : "slate"}>
                              {b.status.toUpperCase()}
@@ -336,7 +427,7 @@ export default function UsersPage() {
                         getRowKey={(d) => d.id}
                         rows={userDeposits}
                         columns={[
-                          { key: "amount", header: "Amount", render: (d) => <span className="text-emerald-400">+₹{fmt(d.amount)}</span> },
+                          { key: "amount", header: "Amount", render: (d) => <span className="text-emerald-400">+{fmtMoney(d.amount)}</span> },
                           { key: "method", header: "Method", render: (d) => d.payment_method },
                           { key: "status", header: "Status", render: (d) => (
                             <Badge color={d.status === "completed" || d.status === "approved" || d.status === "success" ? "emerald" : d.status === "rejected" || d.status === "failed" ? "red" : "amber"}>
@@ -353,7 +444,7 @@ export default function UsersPage() {
                         getRowKey={(w) => w.id}
                         rows={userWithdrawals}
                         columns={[
-                          { key: "amount", header: "Amount", render: (w) => <span className="text-red-400">-₹{fmt(w.amount)}</span> },
+                          { key: "amount", header: "Amount", render: (w) => <span className="text-red-400">-{fmtMoney(w.amount)}</span> },
                           { key: "method", header: "Method", render: (w) => w.payment_method },
                           { key: "status", header: "Status", render: (w) => (
                             <Badge color={w.status === "approved" ? "emerald" : w.status === "rejected" ? "red" : "amber"}>
@@ -472,7 +563,6 @@ export default function UsersPage() {
       {/* Reset password modal */}
       <Modal open={!!resetUser} onClose={() => setResetUser(null)} title={`Reset Password — ${resetUser?.username ?? ""}`}>
         <div className="space-y-4">
-          <ErrorMsg msg={actionError} />
           <Field label="New Password">
             <Input value={resetPw} onChange={(e) => setResetPw(e.target.value)} placeholder="Enter new password" />
           </Field>
