@@ -182,7 +182,7 @@ export default function StarlinePage() {
         <Card title="Starline System Setup" className="text-center py-8">
            <EmptyState 
              title="No Starline Market Found" 
-             description="Initialize the Starline system to start adding time slots."
+             hint="Initialize the Starline system to start adding time slots."
            />
            <Button onClick={initMarket} className="mt-4">Initialize Starline System</Button>
         </Card>
