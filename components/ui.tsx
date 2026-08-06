@@ -590,9 +590,9 @@ export function TimePickerModal({
            </div>
         </div>
 
-        <div className="flex justify-end gap-2 p-4 bg-ink-950 border-t border-white/5">
-           <Button variant="ghost" onClick={onClose}>CANCEL</Button>
-           <Button variant="ghost" className="text-brand-400 hover:text-brand-300" onClick={() => {
+        <div className="flex justify-end gap-3 p-4 bg-ink-950 border-t border-white/5">
+           <Button variant="ghost" onClick={onClose}>Cancel</Button>
+           <Button variant="primary" onClick={() => {
               onChange(`${pad(tempH)}:${pad(tempM)}`);
               onClose();
            }}>OK</Button>
