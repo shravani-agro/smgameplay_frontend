@@ -317,3 +317,8 @@ export async function bulkDeclareStarlineResults(results: any[]) {
   const res = await client.post("/admin/starline/results/bulk-declare", { results });
   return res.data;
 }
+
+export async function deleteStarlineResult(resultId: number) {
+  const res = await client.delete(`/admin/starline/results/${resultId}`);
+  return res.data;
+}

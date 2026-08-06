@@ -21,6 +21,7 @@ import {
   updateStarlineMarket,
   listStarlineResults,
   bulkDeclareStarlineResults,
+  deleteStarlineResult,
 } from "@/lib/admin";
 
 export default function StarlinePage() {
@@ -163,6 +164,17 @@ export default function StarlinePage() {
     }
   }
 
+  async function handleDeleteResult(id: number) {
+    if (!confirm("Are you sure you want to delete this result? This will automatically revert any winnings and update user wallets!")) return;
+    try {
+      await deleteStarlineResult(id);
+      toast.success("Result deleted successfully");
+      loadResults();
+    } catch (err: any) {
+      toast.error(parseApiError(err, "Failed to delete result"));
+    }
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -240,7 +252,8 @@ export default function StarlinePage() {
                        <tr className="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-white/10">
                          <th className="py-2.5 px-4">Date</th>
                          <th className="px-4">Time Slot</th>
-                         <th className="px-4 text-right">Result</th>
+                         <th className="px-4">Result</th>
+                         <th className="px-4 text-right">Actions</th>
                        </tr>
                      </thead>
                      <tbody>
@@ -253,8 +266,22 @@ export default function StarlinePage() {
                            <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.02]">
                              <td className="py-3 px-4 text-slate-300">{dateStr}</td>
                              <td className="px-4 text-slate-400">{r.session_label}</td>
-                             <td className="px-4 font-mono text-emerald-400 font-semibold text-right">
+                             <td className="px-4 font-mono text-emerald-400 font-semibold">
                                 {r.total_result || r.open_result || "—"}
+                             </td>
+                             <td className="px-4 text-right space-x-2">
+                               <Button 
+                                 size="sm" 
+                                 variant="outline" 
+                                 onClick={() => {
+                                   if (r.result_date) setResultDate(r.result_date);
+                                   setSessionLabel(r.session_label);
+                                   setOpenResult(r.open_result || "");
+                                 }}
+                               >
+                                 Edit
+                               </Button>
+                               <Button size="sm" variant="danger" onClick={() => handleDeleteResult(r.id)}>Delete</Button>
                              </td>
                            </tr>
                          )
