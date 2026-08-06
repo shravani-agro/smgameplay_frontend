@@ -502,7 +502,7 @@ export function TimePickerModal({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 10 }}
             transition={{ type: "spring", damping: 25, stiffness: 400 }}
-            className="w-full max-w-[320px] rounded-2xl bg-ink-900 shadow-2xl overflow-hidden border border-white/10" 
+            className="w-full max-w-[320px] max-h-[90vh] flex flex-col rounded-2xl bg-ink-900 shadow-2xl overflow-hidden border border-white/10" 
             onClick={e => e.stopPropagation()}
           >
         <div className="flex items-center justify-center gap-6 bg-brand-600 p-6">
@@ -541,7 +541,7 @@ export function TimePickerModal({
            </div>
         </div>
 
-        <div className="flex justify-center p-8 bg-ink-950">
+        <div className="flex justify-center p-4 sm:p-8 bg-ink-950 flex-1 overflow-y-auto min-h-0">
            <div 
              className="relative h-[260px] w-[260px] rounded-full bg-white/[0.03] shadow-inner ring-1 ring-white/5"
              onPointerDown={(e) => {
@@ -590,7 +590,7 @@ export function TimePickerModal({
            </div>
         </div>
 
-        <div className="flex justify-end gap-3 p-4 bg-ink-950 border-t border-white/5">
+        <div className="flex shrink-0 justify-end gap-3 p-4 bg-ink-950 border-t border-white/5">
            <Button variant="ghost" onClick={onClose}>Cancel</Button>
            <Button variant="primary" onClick={() => {
               onChange(`${pad(tempH)}:${pad(tempM)}`);
