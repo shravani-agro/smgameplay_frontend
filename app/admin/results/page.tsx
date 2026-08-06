@@ -133,7 +133,12 @@ export default function ResultsPage() {
          ? r.result_date.substring(0, 10)
          : r.declared_at ? format(new Date(r.declared_at), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd");
     setResultDate(dateStr);
-    setOpenResult(r.open_result || "");
+    
+    let combinedResult = r.open_result || "";
+    if (r.market_type !== 'starline' && r.open_result && r.close_result) {
+        combinedResult = r.open_result + r.close_result;
+    }
+    setOpenResult(combinedResult);
     setCloseResult(r.close_result || "");
     setSessionLabel(r.session_label || "");
     window.scrollTo({ top: 0, behavior: 'smooth' });
