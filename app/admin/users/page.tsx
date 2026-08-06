@@ -243,6 +243,7 @@ export default function UsersPage() {
                   <span className="font-medium text-slate-100">
                     {u.username}
                     {u.username === "admin" && <Badge color="brand" className="ml-2">Owner</Badge>}
+                    {u.auth_provider === "google" && <Badge color="blue" className="ml-2">Google signed in</Badge>}
                   </span>
                 ),
               },
