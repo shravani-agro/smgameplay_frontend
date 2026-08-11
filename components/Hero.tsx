@@ -59,7 +59,7 @@ export default function Hero() {
             className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <a
-              href="https://github.com/harryongit/smgameplay_frontend/releases/latest/download/smgameplay.apk"
+              href="https://github.com/shravani-agro/smgameplay_frontend/releases/latest/download/smgameplay.apk"
               className="group relative flex items-center justify-center gap-2 rounded-full bg-brand-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_40px_rgba(225,29,72,0.4)] transition-all hover:bg-brand-500 hover:scale-105 hover:shadow-[0_0_60px_rgba(225,29,72,0.6)] w-full sm:w-auto"
             >
               <Download className="h-5 w-5 transition-transform group-hover:-translate-y-1" />

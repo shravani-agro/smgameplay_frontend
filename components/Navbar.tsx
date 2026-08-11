@@ -38,7 +38,7 @@ export default function Navbar() {
             Log in
           </Link>
           <a
-            href="https://github.com/harryongit/smgameplay_frontend/releases/latest/download/smgameplay.apk"
+            href="https://github.com/shravani-agro/smgameplay_frontend/releases/latest/download/smgameplay.apk"
             className="group flex items-center gap-2 rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-white backdrop-blur transition-all hover:bg-white/20 hover:scale-105 ring-1 ring-white/10 hover:ring-white/20"
           >
             <Download className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
