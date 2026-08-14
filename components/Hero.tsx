@@ -6,13 +6,35 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden min-h-screen flex items-center pt-24 pb-20 lg:pt-32 lg:pb-32">
-      {/* Background patterns */}
-      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+    <section
+      className="relative min-h-[700px] flex items-center pt-24 pb-20 lg:pt-32 lg:pb-32 overflow-hidden bg-black"
+    >
+      {/* Video background */}
+      <video
+        className="absolute inset-0 w-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        disablePictureInPicture
+      >
+        <source src="/hero.mp4" type="video/mp4" />
+      </video>
+
+      {/* Gradient overlay for text readability */}
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"
+      />
 
       {/* Animated glowing orbs */}
-      <div className="absolute top-1/4 left-1/4 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/20 blur-[120px] mix-blend-screen animate-pulse-glow" />
-      <div className="absolute top-3/4 right-1/4 h-[400px] w-[400px] translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/15 blur-[100px] mix-blend-screen animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+      <div
+        className="absolute top-1/4 left-1/4 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/15 blur-[120px] mix-blend-screen animate-pulse-glow"
+      />
+      <div
+        className="absolute top-3/4 right-1/4 h-[400px] w-[400px] translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-[100px] mix-blend-screen animate-pulse-glow"
+        style={{ animationDelay: "1.5s" }}
+      />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8 z-10">
         <div className="mx-auto max-w-4xl text-center">
@@ -22,10 +44,14 @@ export default function Hero() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="mb-8 flex justify-center"
           >
-            <div className="group relative rounded-full px-5 py-2 text-sm leading-6 text-brand-300 ring-1 ring-brand-500/30 hover:ring-brand-500/50 bg-brand-500/10 backdrop-blur-md transition-all hover:bg-brand-500/20 cursor-pointer overflow-hidden shadow-glow">
+            <div
+              className="group relative rounded-full px-5 py-2 text-sm leading-6 text-brand-300 ring-1 ring-brand-500/30 hover:ring-brand-500/50 bg-brand-500/10 backdrop-blur-md transition-all hover:bg-brand-500/20 cursor-pointer overflow-hidden shadow-glow"
+            >
               <span className="flex items-center gap-2">
                 <Star className="h-4 w-4 text-brand-400 animate-pulse" />
-                <span className="font-medium text-white tracking-wide">Trusted by 10,000+ top players globally</span>
+                <span className="font-medium text-white tracking-wide">
+                  Trusted by 10,000+ top players globally
+                </span>
                 <ChevronRight className="h-4 w-4 text-brand-400 transition-transform group-hover:translate-x-1" />
               </span>
             </div>
@@ -66,8 +92,6 @@ export default function Hero() {
               Download App Now
               <div className="absolute inset-0 rounded-full border border-white/20" />
             </a>
-
-
           </motion.div>
         </div>
       </div>

@@ -1,6 +1,37 @@
+import type { Metadata } from "next";
+
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
+import HowToPlay from "@/components/HowToPlay";
+import FAQ from "@/components/FAQ";
 import Navbar from "@/components/Navbar";
+
+export const metadata: Metadata = {
+  title: "SMGameplay | Satta Matka Booking Platform",
+  description:
+    "SMGameplay is the trusted satta matka booking platform offering instant withdrawals, real-time results, and 24/7 support. Play responsibly and win big!",
+  keywords: [
+    "satta matka",
+    "satta matka booking",
+    "satta matka results",
+    "satta matka today",
+    "online satta matka",
+    "matka result",
+    "matka guessing",
+    "Indian matka",
+    "satta matka game",
+    "satta matka app",
+  ],
+  openGraph: {
+    title: "SMGameplay | Satta Matka Booking Platform",
+    description:
+      "SMGameplay is the trusted satta matka booking platform offering instant withdrawals, real-time results, and 24/7 support.",
+    type: "website",
+    locale: "en_IN",
+    siteName: "SMGameplay Booking",
+    images: [{ url: "/logo.jpg", alt: "SMGameplay Logo" }],
+  },
+};
 
 export default function Home() {
   return (
@@ -9,14 +40,9 @@ export default function Home() {
       <main>
         <Hero />
         <Features />
+        <HowToPlay />
+        <FAQ />
       </main>
-
-      {/* Simple Footer */}
-      <footer className="relative mt-24 border-t border-white/10 py-10 text-center bg-black/20 backdrop-blur-md">
-        <p className="text-sm font-medium text-slate-500">
-          © {new Date().getFullYear()} SMGameplay Booking. All rights reserved.
-        </p>
-      </footer>
     </div>
   );
 }

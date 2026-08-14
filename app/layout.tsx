@@ -1,10 +1,74 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import Footer from "@/components/Footer";
+import VideoPopup from "@/components/VideoPopup";
 
 export const metadata: Metadata = {
-  title: "Satta Matka Admin",
-  description: "Admin panel for Satta Matka platform",
+  metadataBase: new URL("https://smgameplay.in"),
+  title: {
+    default: "SMGameplay | Satta Matka Booking Platform",
+    template: `%s | SMGameplay Booking`,
+  },
+  description:
+    "SMGameplay is the trusted satta matka booking platform offering instant withdrawals, real-time results, and 24/7 support. Play responsibly and win big!",
+  keywords: [
+    "satta matka",
+    "satta matka booking",
+    "satta matka results",
+    "satta matka today",
+    "online satta matka",
+    "matka result",
+    "matka guessing",
+    "Indian matka",
+    "satta matka game",
+    "satta matka app",
+    "withdrawal",
+    "secure gaming",
+    "win real money",
+  ],
+  authors: [{ name: "SMGameplay Team" }],
+  creator: "SMGameplay",
+  publisher: "SMGameplay",
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: "https://smgameplay.in",
+    siteName: "SMGameplay Booking",
+    title: "SMGameplay | Satta Matka Booking Platform",
+    description:
+      "SMGameplay is the trusted satta matka booking platform offering instant withdrawals, real-time results, and 24/7 support. Play responsibly and win big!",
+    images: [
+      {
+        url: "/logo.jpg",
+        width: 800,
+        height: 600,
+        alt: "SMGameplay Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SMGameplay | Satta Matka Booking Platform",
+    description:
+      "Instant withdrawals, real-time results, and 24/7 support. Play responsibly and win big!",
+    creator: "@SMGameplay",
+    images: ["/logo.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "smgameplay-google-verification",
+  },
 };
 
 export default function RootLayout({
@@ -26,6 +90,8 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning>
         <AuthProvider>{children}</AuthProvider>
+        <Footer />
+        <VideoPopup />
       </body>
     </html>
   );
