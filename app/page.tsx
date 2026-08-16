@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import Hero from "@/components/Hero";
+import GameRates from "@/components/GameRates";
 import Features from "@/components/Features";
 import HowToPlay from "@/components/HowToPlay";
 import FAQ from "@/components/FAQ";
@@ -39,6 +40,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <GameRates />
         <Features />
         <HowToPlay />
         <FAQ />
