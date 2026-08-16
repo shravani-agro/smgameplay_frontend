@@ -42,11 +42,11 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="relative py-20 sm:py-24 lg:py-28 bg-black">
-      <div className="absolute inset-0 bg-black" />
-      <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-black to-transparent pointer-events-none" />
+    <section className="relative py-20 sm:py-24 lg:py-28 bg-transparent">
+      <div className="absolute inset-0 bg-transparent" />
+      <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-[#fdfbf7] to-transparent pointer-events-none" />
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-brand-600/[0.03] blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-b from-transparent via-black/20 to-black pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-b from-transparent via-[#fdfbf7]/50 to-[#fdfbf7] pointer-events-none" />
 
       <div className="relative mx-auto max-w-3xl px-6 sm:px-8">
         <div className="text-center">
@@ -55,7 +55,7 @@ export default function FAQ() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center rounded-full border border-brand-500/20 bg-brand-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand-400"
+            className="inline-flex items-center rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand-600"
           >
             FAQ
           </motion.span>
@@ -65,9 +65,9 @@ export default function FAQ() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.05 }}
-            className="mt-5 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl"
+            className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl"
           >
-            Frequently Asked <span className="bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent">Questions</span>
+            Frequently Asked <span className="bg-gradient-to-r from-slate-600 via-slate-900 to-slate-600 bg-clip-text text-transparent">Questions</span>
           </motion.h2>
 
           <motion.p
@@ -75,13 +75,13 @@ export default function FAQ() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.15 }}
-            className="mt-5 text-base leading-7 text-slate-400 sm:text-lg"
+            className="mt-5 text-base leading-7 text-slate-600 sm:text-lg"
           >
             Everything you need to know about SMGameplay. Still have questions?
             Contact our{" "}
             <Link
               href="/support"
-              className="text-brand-400 hover:text-brand-300 underline underline-offset-2 transition-colors"
+              className="text-brand-600 hover:text-brand-500 underline underline-offset-2 transition-colors"
             >
               support team
             </Link>
@@ -100,7 +100,7 @@ export default function FAQ() {
             >
               <button
                 type="button"
-                className="flex w-full items-center justify-between gap-4 rounded-xl border border-white/10 bg-ink-900/60 px-6 py-4 text-left text-slate-200 backdrop-blur-xl transition-all duration-200 hover:border-white/20 hover:bg-ink-850/60"
+                className="flex w-full items-center justify-between gap-4 rounded-xl border border-slate-200/60 bg-white/80 px-6 py-4 text-left text-slate-900 shadow-sm backdrop-blur-xl transition-all duration-200 hover:border-slate-300 hover:bg-white"
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 aria-expanded={openIndex === index}
               >
@@ -109,7 +109,7 @@ export default function FAQ() {
                   animate={{ rotate: openIndex === index ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <ChevronDown className="h-5 w-5 text-slate-400" />
+                  <ChevronDown className="h-5 w-5 text-slate-500" />
                 </motion.div>
               </button>
 
@@ -122,7 +122,7 @@ export default function FAQ() {
                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     className="overflow-hidden"
                   >
-                    <div className="px-6 pb-4 pt-2 text-sm text-slate-400">
+                    <div className="px-6 pb-4 pt-2 text-sm text-slate-600">
                       {faq.answer}
                     </div>
                   </motion.div>

@@ -34,10 +34,10 @@ export default function HowToPlay() {
   return (
     <section className="relative mesh-bg py-20 sm:py-24 lg:py-28">
       {/* Subtle radial overlay for depth */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(56,189,248,0.03),transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(234,179,8,0.03),transparent_60%)]" />
 
       {/* Smooth fade strip at bottom to blend into next section */}
-      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-b from-transparent via-black/10 to-black pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-b from-transparent via-[#fdfbf7]/50 to-[#fdfbf7] pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
@@ -46,7 +46,7 @@ export default function HowToPlay() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center rounded-full border border-brand-500/20 bg-brand-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand-400"
+            className="inline-flex items-center rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand-600"
           >
             How It Works
           </motion.span>
@@ -56,9 +56,9 @@ export default function HowToPlay() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.05 }}
-            className="mt-5 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl"
+            className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl"
           >
-            Play in <span className="bg-gradient-to-r from-brand-400 to-indigo-300 bg-clip-text text-transparent">4 Simple Steps</span>
+            Play in <span className="bg-gradient-to-r from-brand-500 to-indigo-500 bg-clip-text text-transparent">4 Simple Steps</span>
           </motion.h2>
 
           <motion.p
@@ -66,7 +66,7 @@ export default function HowToPlay() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, delay: 0.15 }}
-            className="mt-5 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg"
+            className="mt-5 max-w-2xl mx-auto text-base leading-7 text-slate-600 sm:text-lg"
           >
             Getting started on SMGameplay takes less than a minute. Follow these
             simple steps to begin your winning journey.
@@ -87,13 +87,13 @@ export default function HowToPlay() {
                   delay: index * 0.08,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="group relative flex h-full flex-col items-center text-center"
+                className="group relative flex h-full flex-col items-center text-center p-6 bg-white/60 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-md hover:bg-white transition-all"
               >
-                <div className="relative mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-500/20 bg-brand-500/10 shadow-[0_0_25px_rgba(225,29,72,0.12)] transition-all duration-500 group-hover:border-brand-400/40 group-hover:bg-brand-500/20 group-hover:shadow-[0_0_30px_rgba(225,29,72,0.2)] group-hover:scale-110">
-                  <Icon className="h-7 w-7 text-brand-400 transition-transform duration-500 group-hover:scale-110" strokeWidth={2} />
+                <div className="relative mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-500/20 bg-brand-50/50 shadow-[0_4px_20px_rgba(225,29,72,0.08)] transition-all duration-500 group-hover:border-brand-400/40 group-hover:bg-brand-50 group-hover:shadow-[0_8px_25px_rgba(225,29,72,0.15)] group-hover:scale-110">
+                  <Icon className="h-7 w-7 text-brand-500 transition-transform duration-500 group-hover:scale-110" strokeWidth={2} />
                 </div>
-                <h3 className="mb-2 text-lg font-bold text-white">{step.title}</h3>
-                <p className="text-sm leading-relaxed text-slate-400 transition-colors group-hover:text-slate-300">
+                <h3 className="mb-2 text-lg font-bold text-slate-900">{step.title}</h3>
+                <p className="text-sm leading-relaxed text-slate-600 transition-colors group-hover:text-slate-700">
                   {step.description}
                 </p>
               </motion.div>
