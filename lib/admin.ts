@@ -150,6 +150,11 @@ export async function resetUserPassword(userId: number, newPassword: string) {
   return res.data;
 }
 
+export async function deleteUser(userId: number) {
+  const res = await client.delete(`/admin/users/${userId}`);
+  return res.data;
+}
+
 export async function getUserContacts(userId: number) {
   const res = await client.get(`/admin/users/${userId}/contacts`);
   return res.data;

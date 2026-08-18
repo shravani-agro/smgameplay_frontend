@@ -24,6 +24,7 @@ import {
   addUserBonus,
   deductUserFunds,
   resetUserPassword,
+  deleteUser,
   getUserDetailed,
   listBids,
   listDeposits,
@@ -74,6 +75,10 @@ export default function UsersPage() {
   const [bonusDesc, setBonusDesc] = useState("Bonus credited");
   const [resetUser, setResetUser] = useState<any>(null);
   const [resetPw, setResetPw] = useState("");
+
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -182,6 +187,24 @@ export default function UsersPage() {
       toast.success("Password reset successfully");
     } catch (e: any) {
       toast.error(parseApiError(e, "Failed to reset password"));
+    }
+  }
+
+  async function submitDelete() {
+    if (!deleteTarget) return;
+    if (deleteConfirm !== deleteTarget.username) return;
+    setDeleting(true);
+    try {
+      await deleteUser(deleteTarget.id);
+      toast.success(`User ${deleteTarget.username} and all related data deleted`);
+      setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
+      setDeleteTarget(null);
+      setDeleteConfirm("");
+      setSelected(null);
+    } catch (e: any) {
+      toast.error(parseApiError(e, "Failed to delete user"));
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -533,6 +556,30 @@ export default function UsersPage() {
                           Reset Password
                        </Button>
                     </Card>
+
+                    {selected.username !== "admin" && !selected.is_admin && (
+                      <Card
+                        title="Delete User"
+                        className="border-red-500/40"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-slate-200">Permanently delete this user</p>
+                            <p className="text-xs text-slate-500 mt-1 max-w-md">
+                              Removes the account and ALL associated data — bets, starline bets, deposits,
+                              withdrawals, transactions, device tokens, contacts, locations and login history.
+                              This action cannot be undone.
+                            </p>
+                          </div>
+                          <Button
+                            variant="danger"
+                            onClick={() => { setDeleteConfirm(""); setDeleteTarget(selected); }}
+                          >
+                            Delete User
+                          </Button>
+                        </div>
+                      </Card>
+                    )}
                   </div>
                 )}
               </div>
@@ -584,6 +631,35 @@ export default function UsersPage() {
             <Button variant="danger" onClick={submitReset}>Reset</Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Delete user confirmation modal */}
+      <Modal open={!!deleteTarget} onClose={() => { setDeleteTarget(null); setDeleteConfirm(""); }} title="Delete User Permanently">
+        {deleteTarget && (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+              You are about to permanently delete <b>{deleteTarget.username}</b> (#{deleteTarget.id}) and ALL of
+              their data. This cannot be undone.
+            </div>
+            <Field label={`Type the username "${deleteTarget.username}" to confirm`}>
+              <Input
+                value={deleteConfirm}
+                onChange={(e) => setDeleteConfirm(e.target.value)}
+                placeholder={deleteTarget.username}
+              />
+            </Field>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => { setDeleteTarget(null); setDeleteConfirm(""); }}>Cancel</Button>
+              <Button
+                variant="danger"
+                disabled={deleting || deleteConfirm !== deleteTarget.username}
+                onClick={submitDelete}
+              >
+                {deleting ? "Deleting…" : "Delete Permanently"}
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
