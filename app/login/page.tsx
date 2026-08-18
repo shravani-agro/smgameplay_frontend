@@ -18,7 +18,7 @@ export default function LoginPage() {
     if (authenticated) router.replace("/admin");
   }, [authenticated, router]);
 
-  async function handleSubmit(e: React.FormEvent) {
+   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
@@ -26,8 +26,12 @@ export default function LoginPage() {
       await login(username, password);
       router.replace("/admin");
     } catch (err: any) {
-      const detail = err?.response?.data?.detail;
-      setError(typeof detail === "string" ? detail : "Login failed. Check credentials.");
+      if (err?.message === "NOT_ADMIN") {
+        setError("This account does not have admin access.");
+      } else {
+        const detail = err?.response?.data?.detail;
+        setError(typeof detail === "string" ? detail : "Login failed. Check credentials.");
+      }
     } finally {
       setLoading(false);
     }

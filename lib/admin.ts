@@ -7,7 +7,15 @@ export interface LoginResult {
 
 export async function login(username: string, password: string): Promise<LoginResult> {
   const res = await client.post<LoginResult>("/auth/login", { username, password });
-  setToken(res.data.access_token);
+  const token = res.data.access_token;
+  // Admin panel must only accept tokens that carry the admin claim. A normal
+  // mobile-app user logging in here must be rejected to avoid privilege
+  // escalation into the admin console.
+  if (!isAdminToken(token)) {
+    clearToken();
+    throw new Error("NOT_ADMIN");
+  }
+  setToken(token);
   return res.data;
 }
 
@@ -16,7 +24,28 @@ export function logout() {
 }
 
 export function isAuthenticated(): boolean {
-  return !!getToken();
+  const token = getToken();
+  return !!token && isAdminToken(token);
+}
+
+/** Decode (not verify — verification happens server-side) the JWT payload. */
+export function decodeToken(token: string): any | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const json = typeof atob === "function" ? atob(payload) : Buffer.from(payload, "base64").toString("utf-8");
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+/** True only if the token explicitly grants admin access. */
+export function isAdminToken(token: string | null): boolean {
+  if (!token) return false;
+  const payload = decodeToken(token);
+  return !!payload && payload.admin === true;
 }
 
 /* ---------------- Admin: Stats ---------------- */
@@ -115,8 +144,8 @@ export async function deductUserFunds(userId: number, amount: number, descriptio
 }
 
 export async function resetUserPassword(userId: number, newPassword: string) {
-  const res = await client.put(`/admin/users/${userId}/reset-password`, null, {
-    params: { new_password: newPassword },
+  const res = await client.put(`/admin/users/${userId}/reset-password`, {
+    new_password: newPassword,
   });
   return res.data;
 }

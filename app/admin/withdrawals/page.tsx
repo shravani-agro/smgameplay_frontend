@@ -368,6 +368,17 @@ export default function WithdrawalsPage() {
                 </Button>
               </div>
             )}
+
+            {detail.status === "approved" && (
+              <div className="flex gap-2 pt-1">
+                <Button variant="success" className="flex-1" onClick={() => openConfirm(detail.id, "process")}>
+                  Process (Mark as Paid)
+                </Button>
+                <Button variant="danger" className="flex-1" onClick={() => openConfirm(detail.id, "reject")}>
+                  Reject
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </SlideOver>
@@ -375,11 +386,12 @@ export default function WithdrawalsPage() {
       <Modal
         open={!!confirm}
         onClose={() => setConfirm(null)}
-        title={`${confirm?.action === "approve" ? "Approve" : "Reject"} withdrawal`}
+        title={`${confirm?.action === "process" ? "Process" : confirm?.action === "approve" ? "Approve" : "Reject"} withdrawal`}
       >
         <p className="text-sm text-slate-300">
           Are you sure you want to <b>{confirm?.action}</b> withdrawal request #{confirm?.id}?
           {confirm?.action === "approve" && " Make sure you have already sent the money to the user."}
+          {confirm?.action === "process" && " This marks the request as paid. Make sure you have already sent the money to the user."}
           {confirm?.action === "reject" && " The amount will be added back to the user's wallet."}
         </p>
         <div className="mt-5 flex justify-end gap-2">
