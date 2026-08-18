@@ -34,32 +34,53 @@ export default function Footer() {
 
       {/* Footer content */}
       <div className="border-t border-white/5 bg-black">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 py-6 flex flex-col lg:flex-row items-center justify-between gap-4">
-          <p className="text-slate-400 text-sm">
-            2026 Satta Matka. All rights reserved.
-          </p>
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 py-10 flex flex-col items-center justify-between gap-8">
+          
+          {/* SEO Links */}
+          <div className="flex flex-col items-center gap-4 w-full border-b border-white/5 pb-8">
+            <h3 className="text-slate-300 font-semibold tracking-wide text-sm uppercase">Quick Links</h3>
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+              <Link href="/kalyan-matka" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Kalyan Matka</Link>
+              <Link href="/dpboss" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Dpboss</Link>
+              <Link href="/satta-king" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Satta King</Link>
+              <Link href="/matka-result" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Matka Result</Link>
+              <Link href="/milan-day" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Milan Day</Link>
+              <Link href="/rajdhani-night" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Rajdhani Night</Link>
+              <Link href="/satta-matka" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Satta Matka</Link>
+              <Link href="/main-bazar" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Main Bazar</Link>
+              <Link href="/kalyan-night" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Kalyan Night</Link>
+              <Link href="/time-bazar" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Time Bazar</Link>
+              <Link href="/kalyan-chart" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Kalyan Chart</Link>
+              <Link href="/dpboss-net" className="text-slate-400 hover:text-amber-400 transition-colors text-sm">Dpboss Net</Link>
+            </div>
+          </div>
 
-          <div className="flex flex-wrap justify-center gap-6">
-            <Link
-              href="/terms"
-              className="text-slate-400 hover:text-white transition-colors text-sm"
-            >
-              Terms
-            </Link>
+          {/* Bottom Legal Links */}
+          <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-4">
+            <p className="text-slate-500 text-sm">
+              &copy; {new Date().getFullYear()} Satta Matka. All rights reserved.
+            </p>
 
-            <Link
-              href="/privacy"
-              className="text-slate-400 hover:text-white transition-colors text-sm"
-            >
-              Privacy
-            </Link>
-
-            <Link
-              href="/support"
-              className="text-slate-400 hover:text-white transition-colors text-sm"
-            >
-              Support
-            </Link>
+            <div className="flex flex-wrap justify-center gap-6">
+              <Link
+                href="/terms"
+                className="text-slate-500 hover:text-white transition-colors text-sm"
+              >
+                Terms
+              </Link>
+              <Link
+                href="/privacy"
+                className="text-slate-500 hover:text-white transition-colors text-sm"
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/support"
+                className="text-slate-500 hover:text-white transition-colors text-sm"
+              >
+                Support
+              </Link>
+            </div>
           </div>
         </div>
       </div>
