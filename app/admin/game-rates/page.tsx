@@ -110,10 +110,10 @@ export default function GameRatesPage() {
           <Card title="Regular Markets" subtitle="Applies to all regular games">
             <div className="space-y-4">
               {REGULAR_BET_TYPES.map((bt) => (
-                <div key={bt.key} className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-ink-950">
+                <div key={bt.key} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-slate-50">
                   <div>
-                    <div className="font-medium text-slate-200">{bt.label}</div>
-                    <div className="text-xs text-slate-500 font-mono mt-1">Key: {bt.key}</div>
+                    <div className="font-medium text-slate-700">{bt.label}</div>
+                    <div className="text-xs text-slate-400 font-mono mt-1">Key: {bt.key}</div>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-400">1 ₹ :</span>
@@ -136,10 +136,10 @@ export default function GameRatesPage() {
               {STARLINE_BET_TYPES.map((bt) => {
                 const starlineKey = `starline_${bt.key}`;
                 return (
-                  <div key={bt.key} className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-ink-950">
+                  <div key={bt.key} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-slate-50">
                     <div>
-                      <div className="font-medium text-slate-200">{bt.label} <Badge color="violet">Starline</Badge></div>
-                      <div className="text-xs text-slate-500 font-mono mt-1">Key: {starlineKey}</div>
+                      <div className="font-medium text-slate-700">{bt.label} <Badge color="violet">Starline</Badge></div>
+                      <div className="text-xs text-slate-400 font-mono mt-1">Key: {starlineKey}</div>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-semibold text-slate-400">1 ₹ :</span>

@@ -54,7 +54,7 @@ export default function AuditPage() {
           <div className="table-wrap">
             <table className="w-full min-w-[820px] text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
                   <th className="py-2.5">ID</th>
                   <th>Admin</th>
                   <th>Action</th>
@@ -65,9 +65,9 @@ export default function AuditPage() {
               </thead>
               <tbody>
                 {logs.map((l) => (
-                  <tr key={l.id} className="border-t border-white/5 hover:bg-white/[0.02]">
-                    <td className="py-3 text-slate-500">{l.id}</td>
-                    <td className="font-medium text-slate-100">{l.admin_id}</td>
+                  <tr key={l.id} className="border-t border-slate-100 hover:bg-slate-50">
+                    <td className="py-3 text-slate-400">{l.id}</td>
+                    <td className="font-medium text-slate-900">{l.admin_id}</td>
                     <td><Badge color="violet" className="font-mono">{l.action_type}</Badge></td>
                     <td className="text-slate-400">{l.endpoint || "—"}</td>
                     <td className="text-slate-400">{l.ip_address || "—"}</td>

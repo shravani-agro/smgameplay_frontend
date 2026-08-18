@@ -87,7 +87,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-6 relative mesh-bg p-6 rounded-3xl border border-white/5 shadow-2xl">
+    <div className="space-y-6 relative mesh-bg p-6 rounded-3xl border border-slate-100 shadow-2xl">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-ink-950/80 pointer-events-none rounded-3xl" />
       <div className="relative z-10 space-y-6">
         <PageHeader
@@ -184,7 +184,7 @@ export default function DashboardPage() {
           <div className="table-wrap">
             <table className="w-full min-w-[560px] text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
                   <th className="py-2.5 font-medium">User</th>
                   <th className="py-2.5 font-medium">Wagered</th>
                   <th className="py-2.5 font-medium">Won</th>
@@ -193,13 +193,13 @@ export default function DashboardPage() {
               </thead>
               <tbody>
                 {topBettors.map((b) => (
-                  <tr key={b.user_id} className="border-t border-white/5 transition-colors hover:bg-white/[0.03]">
-                    <td className="py-3 font-medium text-slate-100">
+                  <tr key={b.user_id} className="border-t border-slate-100 transition-colors hover:bg-slate-50">
+                    <td className="py-3 font-medium text-slate-900">
                       {b.username}
-                      <span className="ml-1.5 text-xs text-slate-500">#{b.user_id}</span>
+                      <span className="ml-1.5 text-xs text-slate-400">#{b.user_id}</span>
                     </td>
-                    <td className="py-3 text-slate-300">{fmtMoney(b.total_wagered)}</td>
-                    <td className="py-3 text-slate-300">{fmtMoney(b.total_won)}</td>
+                    <td className="py-3 text-slate-600">{fmtMoney(b.total_wagered)}</td>
+                    <td className="py-3 text-slate-600">{fmtMoney(b.total_won)}</td>
                     <td className={`py-3 font-medium ${b.net_pl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                       {b.net_pl >= 0 ? "+" : ""}{fmtMoney(b.net_pl)}
                     </td>
@@ -207,7 +207,7 @@ export default function DashboardPage() {
                 ))}
               </tbody>
             </table>
-            {topBettors.length === 0 && <p className="py-8 text-center text-sm text-slate-500">No betting activity yet</p>}
+            {topBettors.length === 0 && <p className="py-8 text-center text-sm text-slate-400">No betting activity yet</p>}
           </div>
         </Card>
 
@@ -225,7 +225,7 @@ export default function DashboardPage() {
               return (
                 <div
                   key={m.market_id}
-                  className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5 transition-colors hover:border-white/20 hover:bg-white/[0.04]"
+                  className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 transition-colors hover:border-slate-300 hover:bg-slate-100"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
@@ -237,20 +237,20 @@ export default function DashboardPage() {
                         {i + 1}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-slate-100">{m.market_name}</p>
-                        <p className="text-xs text-slate-500">
+                        <p className="truncate text-sm font-semibold text-slate-900">{m.market_name}</p>
+                        <p className="text-xs text-slate-400">
                           {fmtNum(m.total_bets)} bets · {fmtMoney(m.total_payouts)} paid out
                         </p>
                       </div>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="text-sm font-bold text-slate-100">{fmtMoney(m.total_stakes)}</p>
+                      <p className="text-sm font-bold text-slate-900">{fmtMoney(m.total_stakes)}</p>
                       <p className={`text-xs font-medium ${m.net_pl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                         {m.net_pl >= 0 ? "+" : ""}{fmtMoney(m.net_pl)}
                       </p>
                     </div>
                   </div>
-                  <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/5">
+                  <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${pct}%` }}
@@ -263,7 +263,7 @@ export default function DashboardPage() {
                 </div>
               );
             })}
-            {markets.length === 0 && <p className="py-8 text-center text-sm text-slate-500">No market data yet</p>}
+            {markets.length === 0 && <p className="py-8 text-center text-sm text-slate-400">No market data yet</p>}
           </div>
         </Card>
       </motion.div>

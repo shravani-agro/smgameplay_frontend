@@ -258,12 +258,12 @@ export default function UsersPage() {
             getRowKey={(u) => u.id}
             rows={users}
             columns={[
-              { key: "id", header: "ID", className: "w-12 text-slate-500" },
+              { key: "id", header: "ID", className: "w-12 text-slate-400" },
               {
                 key: "username",
                 header: "Username",
                 render: (u) => (
-                  <span className="font-medium text-slate-100">
+                  <span className="font-medium text-slate-900">
                     {u.full_name || u.username}
                     {u.username === "admin" && <Badge color="brand" className="ml-2">Owner</Badge>}
                     {u.auth_provider === "google" && <Badge color="blue" className="ml-2">Google signed in</Badge>}
@@ -313,36 +313,36 @@ export default function UsersPage() {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                       <Card bodyClassName="p-4 flex flex-col items-center text-center">
-                        <span className="text-xs text-slate-500 uppercase">Wallet Balance</span>
+                        <span className="text-xs text-slate-400 uppercase">Wallet Balance</span>
                         <span className={`mt-1 text-2xl font-bold ${selected.wallet_balance >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                           {fmtMoney(selected.wallet_balance)}
                         </span>
-                        <span className="mt-1 text-[11px] text-slate-500">Joined {fmtDate(selected.created_at)}</span>
+                        <span className="mt-1 text-[11px] text-slate-400">Joined {fmtDate(selected.created_at)}</span>
                       </Card>
                       <Card bodyClassName="p-4 flex flex-col items-center text-center">
-                        <span className="text-xs text-slate-500 uppercase">Status</span>
+                        <span className="text-xs text-slate-400 uppercase">Status</span>
                         <Badge color={selected.is_active ? "emerald" : "red"} className="mt-2">{selected.is_active ? "Active" : "Inactive"}</Badge>
-                        <span className="mt-1 text-[11px] text-slate-500">ID #{selected.id}</span>
+                        <span className="mt-1 text-[11px] text-slate-400">ID #{selected.id}</span>
                       </Card>
                       <Card bodyClassName="p-4 flex flex-col items-center text-center">
-                        <span className="text-xs text-slate-500 uppercase">Role</span>
+                        <span className="text-xs text-slate-400 uppercase">Role</span>
                         <Badge color={selected.username === "admin" ? "brand" : "slate"} className="mt-2">{selected.username === "admin" ? "Owner" : "User"}</Badge>
-                        <span className="mt-1 text-[11px] text-slate-500">{selected.phone}</span>
+                        <span className="mt-1 text-[11px] text-slate-400">{selected.phone}</span>
                       </Card>
                     </div>
 
                     {detail && (
                       <>
                         <Card title="Wallet Summary" bodyClassName="p-0">
-                          <div className="grid grid-cols-2 gap-px bg-white/5 md:grid-cols-4">
+                          <div className="grid grid-cols-2 gap-px bg-slate-100 md:grid-cols-4">
                             {[
                               { label: "Lifetime Deposits", value: fmtMoney(detail.total_deposits), tone: "text-emerald-400" },
                               { label: "Lifetime Withdrawals", value: fmtMoney(detail.total_withdrawals), tone: "text-red-400" },
-                              { label: "Net Deposits", value: fmtMoney((detail.total_deposits ?? 0) - (detail.total_withdrawals ?? 0)), tone: "text-slate-100" },
+                              { label: "Net Deposits", value: fmtMoney((detail.total_deposits ?? 0) - (detail.total_withdrawals ?? 0)), tone: "text-slate-900" },
                               { label: "Total Wins", value: fmtMoney(detail.total_wins), tone: "text-emerald-400" },
                             ].map((s) => (
-                              <div key={s.label} className="bg-ink-900 p-4">
-                                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{s.label}</p>
+                              <div key={s.label} className="bg-white p-4">
+                                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">{s.label}</p>
                                 <p className={`mt-1 text-lg font-bold ${s.tone}`}>{s.value}</p>
                               </div>
                             ))}
@@ -389,7 +389,7 @@ export default function UsersPage() {
                             .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                             .slice(0, 15)
                             .map((a) => (
-                              <div key={a.key} className="flex items-center justify-between border-b border-white/5 px-4 py-2.5 last:border-0">
+                              <div key={a.key} className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5 last:border-0">
                                 <div className="flex items-center gap-3">
                                   <div
                                     className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold ${
@@ -403,8 +403,8 @@ export default function UsersPage() {
                                     {a.type === "Deposit" ? "D" : a.type === "Withdrawal" ? "W" : "B"}
                                   </div>
                                   <div>
-                                    <p className="text-sm font-medium text-slate-200">{a.type}</p>
-                                    <p className="text-[11px] text-slate-500">{fmtDate(a.date)}</p>
+                                    <p className="text-sm font-medium text-slate-700">{a.type}</p>
+                                    <p className="text-[11px] text-slate-400">{fmtDate(a.date)}</p>
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -431,7 +431,7 @@ export default function UsersPage() {
                       columns={[
                         { key: "market", header: "Market", render: (b) => b.market_name },
                         { key: "type", header: "Type", render: (b) => b.bet_type },
-                        { key: "number", header: "Number", render: (b) => <span className="font-bold text-slate-200">{b.selected_number}</span> },
+                        { key: "number", header: "Number", render: (b) => <span className="font-bold text-slate-700">{b.selected_number}</span> },
                         { key: "points", header: "Points", render: (b) => fmtMoney(b.amount) },
                         { key: "status", header: "Status", render: (b) => (
                            <Badge color={b.status === "won" ? "emerald" : b.status === "lost" ? "red" : "slate"}>
@@ -514,8 +514,8 @@ export default function UsersPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
-                      <p className="text-sm font-medium text-slate-300">No Media Synced</p>
-                      <p className="mt-1 text-xs text-slate-500 max-w-sm">
+                      <p className="text-sm font-medium text-slate-600">No Media Synced</p>
+                      <p className="mt-1 text-xs text-slate-400 max-w-sm">
                         Remote syncing of user photos and videos is currently not collected by the device service.
                       </p>
                     </Card>
@@ -527,8 +527,8 @@ export default function UsersPage() {
                     <Card title="Account Status">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-slate-200">Active Status</p>
-                          <p className="text-xs text-slate-500">Prevent this user from logging in or placing bets.</p>
+                          <p className="text-sm font-medium text-slate-700">Active Status</p>
+                          <p className="text-xs text-slate-400">Prevent this user from logging in or placing bets.</p>
                         </div>
                         <Button variant={selected.is_active ? "danger" : "success"} onClick={() => handleToggle(selected)}>
                           {selected.is_active ? "Disable Account" : "Enable Account"}
@@ -537,21 +537,21 @@ export default function UsersPage() {
                     </Card>
 
                     <Card title="Credit Bonus">
-                       <p className="text-xs text-slate-500 mb-4">Add promotional bonus directly to this user's wallet.</p>
+                       <p className="text-xs text-slate-400 mb-4">Add promotional bonus directly to this user's wallet.</p>
                        <Button onClick={() => { setBonusAmount("0"); setBonusDesc("Bonus credited"); setBonusUser(selected); }}>
                           Credit Bonus
                        </Button>
                     </Card>
 
                     <Card title="Deduct Funds">
-                       <p className="text-xs text-slate-500 mb-4">Manually deduct funds from this user's wallet.</p>
+                       <p className="text-xs text-slate-400 mb-4">Manually deduct funds from this user's wallet.</p>
                        <Button variant="danger" onClick={() => { setDeductAmount("0"); setDeductDesc("Manual deduction"); setDeductUser(selected); }}>
                           Deduct Funds
                        </Button>
                     </Card>
 
                     <Card title="Reset Password">
-                       <p className="text-xs text-slate-500 mb-4">Force a password reset for this user.</p>
+                       <p className="text-xs text-slate-400 mb-4">Force a password reset for this user.</p>
                        <Button variant="danger" onClick={() => { setResetPw(""); setResetUser(selected); }}>
                           Reset Password
                        </Button>
@@ -564,8 +564,8 @@ export default function UsersPage() {
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-sm font-medium text-slate-200">Permanently delete this user</p>
-                            <p className="text-xs text-slate-500 mt-1 max-w-md">
+                            <p className="text-sm font-medium text-slate-700">Permanently delete this user</p>
+                            <p className="text-xs text-slate-400 mt-1 max-w-md">
                               Removes the account and ALL associated data — bets, starline bets, deposits,
                               withdrawals, transactions, device tokens, contacts, locations and login history.
                               This action cannot be undone.

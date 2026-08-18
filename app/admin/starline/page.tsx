@@ -204,7 +204,7 @@ export default function StarlinePage() {
            {/* Left Column: Time Slots & Results */}
            <div className="lg:col-span-2 space-y-6">
              <Card title="Time Slots (Sessions)" subtitle="Add direct time slots for Starline">
-               <div className="mb-6 p-4 rounded-xl border border-white/10 bg-white/[0.02] flex flex-wrap gap-4 items-end">
+               <div className="mb-6 p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap gap-4 items-end">
                  <div className="w-48">
                    <label className="mb-1 block text-xs font-medium text-slate-400">Result Time</label>
                    <TimePicker value={newTime} onChange={setNewTime} />
@@ -218,15 +218,15 @@ export default function StarlinePage() {
                  <div className="table-wrap">
                    <table className="w-full text-sm">
                      <thead>
-                       <tr className="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-white/10">
+                       <tr className="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-slate-200">
                          <th className="py-2.5 px-4">Time Slot</th>
                          <th className="text-right px-4">Action</th>
                        </tr>
                      </thead>
                      <tbody>
                        {market.schedules.map((s: any, idx: number) => (
-                         <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.02]">
-                           <td className="py-3 px-4 font-medium text-slate-200">{s.session_label}</td>
+                         <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
+                           <td className="py-3 px-4 font-medium text-slate-700">{s.session_label}</td>
                            <td className="px-4 text-right">
                              <Button size="sm" variant="danger" onClick={() => handleRemoveSlot(idx)}>Delete</Button>
                            </td>
@@ -249,7 +249,7 @@ export default function StarlinePage() {
                  <div className="table-wrap">
                    <table className="w-full text-sm">
                      <thead>
-                       <tr className="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-white/10">
+                       <tr className="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-slate-200">
                          <th className="py-2.5 px-4">Date</th>
                          <th className="px-4">Time Slot</th>
                          <th className="px-4">Result</th>
@@ -263,8 +263,8 @@ export default function StarlinePage() {
                             : r.declared_at ? format(new Date(r.declared_at), "dd/MM/yyyy") : "—";
                          
                          return (
-                           <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                             <td className="py-3 px-4 text-slate-300">{dateStr}</td>
+                           <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50">
+                             <td className="py-3 px-4 text-slate-600">{dateStr}</td>
                              <td className="px-4 text-slate-400">{r.session_label}</td>
                              <td className="px-4 font-mono text-emerald-400 font-semibold">
                                 {r.total_result || r.open_result || "—"}

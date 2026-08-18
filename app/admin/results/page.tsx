@@ -278,20 +278,20 @@ export default function ResultsPage() {
       {preview && (
         <Card title={`Preview — Market #${preview.market_id}`}>
           <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="rounded-xl bg-white/5 p-3">
-              <div className="text-xs text-slate-500">Pending bets</div>
-              <div className="text-lg font-semibold text-slate-100">{preview.total_pending_bets}</div>
+            <div className="rounded-xl bg-slate-100 p-3">
+              <div className="text-xs text-slate-400">Pending bets</div>
+              <div className="text-lg font-semibold text-slate-900">{preview.total_pending_bets}</div>
             </div>
-            <div className="rounded-xl bg-white/5 p-3">
-              <div className="text-xs text-slate-500">Total stakes</div>
-              <div className="text-lg font-semibold text-slate-100">{preview.total_stakes}</div>
+            <div className="rounded-xl bg-slate-100 p-3">
+              <div className="text-xs text-slate-400">Total stakes</div>
+              <div className="text-lg font-semibold text-slate-900">{preview.total_stakes}</div>
             </div>
           </div>
           {preview.bets?.length ? (
             <div className="table-wrap">
               <table className="w-full min-w-[640px] text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                  <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
                     <th className="py-2.5">Bet ID</th>
                     <th>User</th>
                     <th>Type</th>
@@ -302,9 +302,9 @@ export default function ResultsPage() {
                 </thead>
                 <tbody>
                   {preview.bets.map((b: any) => (
-                    <tr key={b.id} className="border-t border-white/5">
-                      <td className="py-3 text-slate-500">{b.id}</td>
-                      <td className="text-slate-100">{b.user_id}</td>
+                    <tr key={b.id} className="border-t border-slate-100">
+                      <td className="py-3 text-slate-400">{b.id}</td>
+                      <td className="text-slate-900">{b.user_id}</td>
                       <td>{b.bet_type}</td>
                       <td>{b.selected_number}</td>
                       <td>{b.amount}</td>
@@ -352,7 +352,7 @@ export default function ResultsPage() {
             </div>
             <table className="w-full min-w-[700px] text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-white/10">
+                <tr className="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-slate-200">
                   <th className="py-2.5 px-2">Date</th>
                   <th className="px-2">Market</th>
                   <th className="px-2">Time/Slot</th>
@@ -376,9 +376,9 @@ export default function ResultsPage() {
                      : r.declared_at ? format(new Date(r.declared_at), "dd/MM/yyyy") : "—";
                   
                   return (
-                    <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                      <td className="py-3 px-2 text-slate-300">{dateStr}</td>
-                      <td className="px-2 text-slate-100">{r.market_name}</td>
+                    <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50">
+                      <td className="py-3 px-2 text-slate-600">{dateStr}</td>
+                      <td className="px-2 text-slate-900">{r.market_name}</td>
                       <td className="px-2 text-slate-400">
                          {r.market_type === 'starline' ? r.session_label : 'Regular'}
                       </td>
@@ -404,7 +404,7 @@ export default function ResultsPage() {
         onClose={() => setConfirmRollback(null)}
         title="Rollback Result"
       >
-        <p className="text-sm text-slate-300">
+        <p className="text-sm text-slate-600">
           Are you sure you want to rollback this result for <b>{confirmRollback?.market_name}</b>?
           This will revert all settled bets to pending and deduct any winnings that were paid out.
         </p>
@@ -419,7 +419,7 @@ export default function ResultsPage() {
         onClose={() => setConfirmDelete(null)}
         title="Delete Result"
       >
-        <p className="text-sm text-slate-300">
+        <p className="text-sm text-slate-600">
           Are you sure you want to delete this result for <b>{confirmDelete?.market_name}</b>?
         </p>
         <div className="mt-5 flex justify-end gap-2">

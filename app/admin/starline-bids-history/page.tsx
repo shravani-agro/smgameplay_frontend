@@ -105,7 +105,7 @@ export default function StarlineBidsHistoryPage() {
           <div className="table-wrap">
             <table className="w-full min-w-[900px] text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
                   <th>ID</th>
                   <th>User</th>
                   <th>Market</th>
@@ -122,9 +122,9 @@ export default function StarlineBidsHistoryPage() {
               </thead>
               <tbody>
                 {items.map((b) => (
-                  <tr key={b.id} className="border-t border-white/5 hover:bg-white/[0.02]">
-                    <td className="py-3 text-slate-500">{b.id}</td>
-                    <td className="font-medium text-slate-100">{b.username || b.user_id}</td>
+                  <tr key={b.id} className="border-t border-slate-100 hover:bg-slate-50">
+                    <td className="py-3 text-slate-400">{b.id}</td>
+                    <td className="font-medium text-slate-900">{b.username || b.user_id}</td>
                     <td>{b.market_name}</td>
                     <td>{b.session || "-"}</td>
                     <td>{b.bid_date ? format(new Date(b.bid_date), "dd/MM/yyyy") : "-"}</td>

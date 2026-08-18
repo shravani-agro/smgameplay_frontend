@@ -97,13 +97,13 @@ export default function DepositsPage() {
               onClick={() => setStatus(s.id)}
               className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all whitespace-nowrap ${
                 active
-                  ? "bg-brand-600 text-white shadow-glow"
-                  : "border border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/20 hover:text-slate-200"
+                  ? "bg-brand-600 text-slate-900 shadow-glow"
+                  : "border border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300 hover:text-slate-700"
               }`}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-white/80" : statusDot[s.id] ?? "bg-slate-500"}`} />
               {s.label}
-              <span className={`rounded-full px-1.5 text-[10px] font-bold ${active ? "bg-white/20 text-white" : "bg-white/10 text-slate-400"}`}>
+              <span className={`rounded-full px-1.5 text-[10px] font-bold ${active ? "bg-white/20 text-slate-900" : "bg-slate-200 text-slate-400"}`}>
                 {count}
               </span>
             </button>
@@ -123,7 +123,7 @@ export default function DepositsPage() {
             <div className="table-wrap hidden md:block">
               <table className="w-full min-w-[820px] text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                  <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
                     <th>Txn ID</th>
                     <th>User</th>
                     <th>Method</th>
@@ -134,9 +134,9 @@ export default function DepositsPage() {
                 </thead>
                 <tbody>
                   {items.map((d) => (
-                    <tr key={d.id} className="border-t border-white/5 transition-colors hover:bg-white/[0.03]">
-                      <td className="py-3 font-medium text-slate-100">{d.txn_id}</td>
-                      <td className="text-slate-500">#{d.user_id}</td>
+                    <tr key={d.id} className="border-t border-slate-100 transition-colors hover:bg-slate-50">
+                      <td className="py-3 font-medium text-slate-900">{d.txn_id}</td>
+                      <td className="text-slate-400">#{d.user_id}</td>
                       <td className="text-slate-400">
                         <Badge color="slate">{d.method}</Badge>
                       </td>
@@ -155,16 +155,16 @@ export default function DepositsPage() {
             </div>
             <div className="space-y-2.5 p-2 md:hidden">
               {items.map((d) => (
-                <div key={d.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5">
+                <div key={d.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3.5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate font-mono text-sm font-semibold text-slate-100">{d.txn_id}</p>
-                      <p className="mt-0.5 text-xs text-slate-500">User #{d.user_id} · {d.method}</p>
+                      <p className="truncate font-mono text-sm font-semibold text-slate-900">{d.txn_id}</p>
+                      <p className="mt-0.5 text-xs text-slate-400">User #{d.user_id} · {d.method}</p>
                     </div>
                     <Badge color={statusColor[d.status] ?? "slate"}>{d.status}</Badge>
                   </div>
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-slate-400">
                       {format(new Date(d.created_at), "dd/MM/yyyy hh:mm a")}
                     </span>
                     <span className="text-lg font-bold text-emerald-400">{fmtMoney(d.amount)}</span>

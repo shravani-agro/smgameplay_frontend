@@ -93,27 +93,26 @@ html {
   }
 
   .card {
-    @apply relative overflow-hidden rounded-2xl border border-white/10 bg-ink-900/60 shadow-card backdrop-blur-xl transition-all duration-300;
+    @apply relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300;
   }
-  /* Soft top hairline that reads as light hitting a glass edge */
   .card::before {
     content: "";
-    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent;
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-100 to-transparent;
   }
   .card:hover {
-    @apply border-white/20 bg-ink-900/80 shadow-[0_8px_30px_rgb(0,0,0,0.5)];
+    @apply border-slate-300 shadow-md;
   }
 
   .input-base {
-    @apply w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition-all duration-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/20 backdrop-blur-sm;
+    @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/20;
   }
 
   /* Navigation links with a refined active indicator (left accent bar) */
   .nav-link {
-    @apply relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-200 hover:bg-white/[0.06] hover:text-slate-100;
+    @apply relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900;
   }
   .nav-link-active {
-    @apply bg-brand-500/10 text-brand-300 shadow-[inset_0_0_0_1px_rgba(244,63,94,0.25)];
+    @apply bg-brand-50 text-brand-600 shadow-[inset_0_0_0_1px_rgba(244,63,94,0.15)];
   }
   .nav-link-active::before {
     content: "";

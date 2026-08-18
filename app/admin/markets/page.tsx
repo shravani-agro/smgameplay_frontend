@@ -248,7 +248,7 @@ export default function MarketsPage() {
           <div className="table-wrap">
             <table className="w-full min-w-[760px] text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
                   <th className="py-2.5 w-8"></th>
                   <th>ID</th>
                   <th>Name</th>
@@ -262,7 +262,7 @@ export default function MarketsPage() {
                 {markets.map((m, idx) => (
                   <tr 
                     key={m.id} 
-                    className="border-t border-white/5 hover:bg-white/[0.02] cursor-move"
+                    className="border-t border-slate-100 hover:bg-slate-50 cursor-move"
                     draggable
                     onDragStart={(e) => handleDragStart(e, idx)}
                     onDragEnter={(e) => handleDragEnter(e, idx)}
@@ -272,8 +272,8 @@ export default function MarketsPage() {
                     <td className="py-3 text-slate-600 pl-3">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>
                     </td>
-                    <td className="text-slate-500">{m.id}</td>
-                    <td className="font-medium text-slate-100">
+                    <td className="text-slate-400">{m.id}</td>
+                    <td className="font-medium text-slate-900">
                       {m.name} {m.holiday_status && <Badge color="amber" className="ml-2">Holiday</Badge>}
                     </td>
                     <td>
@@ -380,7 +380,7 @@ export default function MarketsPage() {
                   </div>
                   
                   <div className="mt-4 flex items-center justify-between">
-                    <div className="text-sm font-semibold text-slate-200">Time Slots</div>
+                    <div className="text-sm font-semibold text-slate-700">Time Slots</div>
                     <Button size="sm" type="button" onClick={addSchedule}>+ Add Slot</Button>
                   </div>
                   {formData.schedules.length === 0 && (
@@ -405,8 +405,8 @@ export default function MarketsPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-400">Holiday Status</label>
-                  <div className="flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-3">
-                     <span className="text-sm text-slate-300">{formData.holiday_status ? 'Active Holiday' : 'Normal'}</span>
+                  <div className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-slate-100 px-3">
+                     <span className="text-sm text-slate-600">{formData.holiday_status ? 'Active Holiday' : 'Normal'}</span>
                      <div className="ml-auto">
                         <Button 
                            type="button"
@@ -435,7 +435,7 @@ export default function MarketsPage() {
         title="Delete Market"
         description={confirmDelete?.name}
       >
-        <p className="text-sm text-slate-300">
+        <p className="text-sm text-slate-600">
           This will soft-delete the market. Are you sure you want to continue?
         </p>
         <div className="mt-5 flex justify-end gap-2">

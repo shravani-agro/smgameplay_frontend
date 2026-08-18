@@ -159,13 +159,13 @@ export default function WithdrawalsPage() {
               onClick={() => setStatus(s.id)}
               className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all whitespace-nowrap ${
                 active
-                  ? "bg-brand-600 text-white shadow-glow"
-                  : "border border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/20 hover:text-slate-200"
+                  ? "bg-brand-600 text-slate-900 shadow-glow"
+                  : "border border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300 hover:text-slate-700"
               }`}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-white/80" : statusDot[s.id] ?? "bg-slate-500"}`} />
               {s.label}
-              <span className={`rounded-full px-1.5 text-[10px] font-bold ${active ? "bg-white/20 text-white" : "bg-white/10 text-slate-400"}`}>
+              <span className={`rounded-full px-1.5 text-[10px] font-bold ${active ? "bg-white/20 text-slate-900" : "bg-slate-200 text-slate-400"}`}>
                 {count}
               </span>
             </button>
@@ -185,7 +185,7 @@ export default function WithdrawalsPage() {
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/20 text-sm text-brand-300">✓</div>
               <div>
-                <p className="text-sm font-semibold text-white">{selected.length} selected</p>
+                <p className="text-sm font-semibold text-slate-900">{selected.length} selected</p>
                 <p className="text-[11px] text-brand-300/80">Only pending requests can be bulk approved</p>
               </div>
             </div>
@@ -206,7 +206,7 @@ export default function WithdrawalsPage() {
           <div className="table-wrap">
             <table className="w-full min-w-[820px] text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
                   <th className="py-2.5">
                     <input
                       type="checkbox"
@@ -230,8 +230,8 @@ export default function WithdrawalsPage() {
                   <tr
                     key={w.id}
                     onClick={() => setDetail(w)}
-                    className={`border-t border-white/5 transition-colors cursor-pointer ${
-                      selected.includes(w.id) ? "bg-brand-500/[0.07]" : "hover:bg-white/[0.03]"
+                    className={`border-t border-slate-100 transition-colors cursor-pointer ${
+                      selected.includes(w.id) ? "bg-brand-500/[0.07]" : "hover:bg-slate-50"
                     }`}
                   >
                     <td className="py-3 pointer-events-none" onClick={(e) => e.stopPropagation()}>
@@ -242,12 +242,12 @@ export default function WithdrawalsPage() {
                         onChange={() => toggle(w.id)}
                       />
                     </td>
-                    <td className="text-slate-500">#{w.id}</td>
-                    <td className="font-medium text-slate-100">
+                    <td className="text-slate-400">#{w.id}</td>
+                    <td className="font-medium text-slate-900">
                       {w.username}
-                      <span className="ml-1.5 text-xs text-slate-500">(#{w.user_id})</span>
+                      <span className="ml-1.5 text-xs text-slate-400">(#{w.user_id})</span>
                     </td>
-                    <td className="font-semibold text-slate-100">{fmtMoney(w.amount)}</td>
+                    <td className="font-semibold text-slate-900">{fmtMoney(w.amount)}</td>
                     <td>
                       <Badge color={statusColor[w.status] ?? "slate"}>{w.status}</Badge>
                     </td>
@@ -287,20 +287,20 @@ export default function WithdrawalsPage() {
       >
         {detail && (
           <div className="space-y-5">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-transparent p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-gradient-to-br from-white/[0.06] to-transparent p-5">
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">Amount</p>
-                <p className="mt-1 text-3xl font-bold text-white">{fmtMoney(detail.amount)}</p>
+                <p className="text-xs uppercase tracking-wide text-slate-400">Amount</p>
+                <p className="mt-1 text-3xl font-bold text-slate-900">{fmtMoney(detail.amount)}</p>
               </div>
               <Badge color={statusColor[detail.status] ?? "slate"} className="text-sm px-3 py-1">{detail.status}</Badge>
             </div>
 
             {isUpi ? (
               <div>
-                <h4 className="mb-3 text-sm font-semibold text-slate-200">UPI Details</h4>
-                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <h4 className="mb-3 text-sm font-semibold text-slate-700">UPI Details</h4>
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <div>
-                    <p className="text-xs text-slate-500">UPI ID</p>
+                    <p className="text-xs text-slate-400">UPI ID</p>
                     <p className="mt-0.5 font-mono text-base font-semibold text-brand-300">{bank.upi_id}</p>
                   </div>
                   <Button size="sm" variant="outline" onClick={() => copyText(bank.upi_id, "UPI ID")}>Copy</Button>
@@ -308,17 +308,17 @@ export default function WithdrawalsPage() {
               </div>
             ) : (
               <div>
-                <h4 className="mb-3 text-sm font-semibold text-slate-200">Bank Details</h4>
+                <h4 className="mb-3 text-sm font-semibold text-slate-700">Bank Details</h4>
                 <div className="space-y-2.5">
                   {[
                     { label: "Account Holder", value: bank.account_holder },
                     { label: "Account Number", value: bank.account_number },
                     { label: "IFSC", value: bank.ifsc },
                   ].filter((f) => f.value).map((f) => (
-                    <div key={f.label} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                    <div key={f.label} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                       <div className="min-w-0">
-                        <p className="text-xs text-slate-500">{f.label}</p>
-                        <p className="mt-0.5 truncate font-mono text-sm font-semibold text-slate-100">{f.value}</p>
+                        <p className="text-xs text-slate-400">{f.label}</p>
+                        <p className="mt-0.5 truncate font-mono text-sm font-semibold text-slate-900">{f.value}</p>
                       </div>
                       <Button size="sm" variant="outline" onClick={() => copyText(String(f.value), f.label)}>Copy</Button>
                     </div>
@@ -328,24 +328,24 @@ export default function WithdrawalsPage() {
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-xs text-slate-500">Net Amount</p>
-                <p className="mt-1 text-lg font-bold text-slate-100">{fmtMoney(bank.net_amount ?? detail.amount)}</p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs text-slate-400">Net Amount</p>
+                <p className="mt-1 text-lg font-bold text-slate-900">{fmtMoney(bank.net_amount ?? detail.amount)}</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-xs text-slate-500">Fee ({bank.fee_percent ?? 0}%)</p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs text-slate-400">Fee ({bank.fee_percent ?? 0}%)</p>
                 <p className="mt-1 text-lg font-bold text-red-400">-{fmtMoney(bank.fee_amount ?? 0)}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-xs text-slate-500">Requested</p>
-                <p className="mt-1 text-sm text-slate-200">{format(new Date(detail.requested_at), "dd MMM yyyy, hh:mm a")}</p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs text-slate-400">Requested</p>
+                <p className="mt-1 text-sm text-slate-700">{format(new Date(detail.requested_at), "dd MMM yyyy, hh:mm a")}</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-xs text-slate-500">Processed</p>
-                <p className="mt-1 text-sm text-slate-200">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs text-slate-400">Processed</p>
+                <p className="mt-1 text-sm text-slate-700">
                   {detail.processed_at ? format(new Date(detail.processed_at), "dd MMM yyyy, hh:mm a") : "—"}
                 </p>
               </div>
@@ -354,7 +354,7 @@ export default function WithdrawalsPage() {
             {detail.admin_remarks && (
               <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
                 <p className="text-xs font-medium text-amber-300">Admin Remarks</p>
-                <p className="mt-1 text-sm text-slate-300">{detail.admin_remarks}</p>
+                <p className="mt-1 text-sm text-slate-600">{detail.admin_remarks}</p>
               </div>
             )}
 
@@ -388,7 +388,7 @@ export default function WithdrawalsPage() {
         onClose={() => setConfirm(null)}
         title={`${confirm?.action === "process" ? "Process" : confirm?.action === "approve" ? "Approve" : "Reject"} withdrawal`}
       >
-        <p className="text-sm text-slate-300">
+        <p className="text-sm text-slate-600">
           Are you sure you want to <b>{confirm?.action}</b> withdrawal request #{confirm?.id}?
           {confirm?.action === "approve" && " Make sure you have already sent the money to the user."}
           {confirm?.action === "process" && " This marks the request as paid. Make sure you have already sent the money to the user."}

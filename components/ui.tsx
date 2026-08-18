@@ -25,18 +25,18 @@ export function Card({
   bodyClassName?: string;
 }) {
   return (
-    <div className={cn("card animate-fade-in group hover:border-white/20 transition-all duration-300", className)}>
+    <div className={cn("card animate-fade-in group hover:border-slate-300 transition-all duration-300", className)}>
       {(title || actions) && (
-        <div className="flex flex-col gap-3 border-b border-white/5 px-5 py-4 sm:flex-row sm:items-center sm:justify-between bg-white/[0.015]">
+        <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between bg-slate-50">
           <div className="flex min-w-0 items-center gap-3">
             {icon && (
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-base text-brand-300 ring-1 ring-inset ring-white/10">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-base text-brand-700 ring-1 ring-inset ring-slate-200">
                 {icon}
               </span>
             )}
             <div className="min-w-0">
-              {title && <h3 className="truncate text-base font-semibold text-slate-100">{title}</h3>}
-              {subtitle && <p className="mt-0.5 truncate text-xs text-slate-500">{subtitle}</p>}
+              {title && <h3 className="truncate text-base font-semibold text-slate-900">{title}</h3>}
+              {subtitle && <p className="mt-0.5 truncate text-xs text-slate-9000">{subtitle}</p>}
             </div>
           </div>
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -62,11 +62,11 @@ export function Button({
 }) {
   const variants: Record<string, string> = {
     primary: "bg-brand-600 hover:bg-brand-500 text-white shadow-glow focus-visible:ring-brand-500/40",
-    secondary: "bg-ink-700 hover:bg-ink-600 text-slate-100 focus-visible:ring-white/20",
+    secondary: "bg-slate-100 hover:bg-slate-200 text-slate-900 focus-visible:ring-slate-300",
     danger: "bg-red-600 hover:bg-red-500 text-white focus-visible:ring-red-500/40",
     success: "bg-emerald-600 hover:bg-emerald-500 text-white focus-visible:ring-emerald-500/40",
-    ghost: "bg-transparent hover:bg-white/5 text-slate-300 focus-visible:ring-white/20",
-    outline: "border border-white/10 bg-transparent hover:bg-white/5 text-slate-200 focus-visible:ring-white/20",
+    ghost: "bg-transparent hover:bg-slate-100 text-slate-600 focus-visible:ring-slate-300",
+    outline: "border border-slate-200 bg-transparent hover:bg-slate-100 text-slate-700 focus-visible:ring-slate-300",
   };
   const sizes: Record<string, string> = {
     sm: "h-8 px-3 text-xs",
@@ -104,14 +104,14 @@ export function Badge({
   className?: string;
 }) {
   const colors: Record<string, string> = {
-    slate: "bg-white/5 text-slate-300 ring-1 ring-inset ring-white/10 shadow-[0_0_10px_rgba(255,255,255,0.02)]",
-    green: "bg-emerald-500/10 text-emerald-300 ring-1 ring-inset ring-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]",
-    red: "bg-red-500/10 text-red-300 ring-1 ring-inset ring-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.2)]",
-    amber: "bg-amber-500/10 text-amber-300 ring-1 ring-inset ring-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.2)]",
-    blue: "bg-sky-500/10 text-sky-300 ring-1 ring-inset ring-sky-500/20 shadow-[0_0_10px_rgba(14,165,233,0.2)]",
-    emerald: "bg-emerald-500/10 text-emerald-300 ring-1 ring-inset ring-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]",
-    brand: "bg-brand-500/10 text-brand-300 ring-1 ring-inset ring-brand-500/20 shadow-[0_0_10px_rgba(139,92,246,0.2)]",
-    violet: "bg-violet-500/10 text-violet-300 ring-1 ring-inset ring-violet-500/20 shadow-[0_0_10px_rgba(139,92,246,0.2)]",
+    slate: "bg-slate-100 text-slate-600 ring-1 ring-inset ring-slate-200 shadow-sm",
+    green: "bg-emerald-500/10 text-emerald-700 ring-1 ring-inset ring-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]",
+    red: "bg-red-500/10 text-red-700 ring-1 ring-inset ring-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.2)]",
+    amber: "bg-amber-500/10 text-amber-700 ring-1 ring-inset ring-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.2)]",
+    blue: "bg-sky-500/10 text-sky-700 ring-1 ring-inset ring-sky-500/20 shadow-[0_0_10px_rgba(14,165,233,0.2)]",
+    emerald: "bg-emerald-500/10 text-emerald-700 ring-1 ring-inset ring-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]",
+    brand: "bg-brand-500/10 text-brand-700 ring-1 ring-inset ring-brand-500/20 shadow-[0_0_10px_rgba(139,92,246,0.2)]",
+    violet: "bg-violet-500/10 text-violet-700 ring-1 ring-inset ring-violet-500/20 shadow-[0_0_10px_rgba(139,92,246,0.2)]",
   };
   return (
     <span
@@ -153,7 +153,7 @@ export function Select({
 }
 
 export function Label({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <label className={cn("mb-1.5 block text-xs font-medium text-slate-400", className)}>{children}</label>;
+  return <label className={cn("mb-1.5 block text-xs font-medium text-slate-500", className)}>{children}</label>;
 }
 
 export function Field({
@@ -168,7 +168,7 @@ export function Field({
   return (
     <div>
       <Label>{label}</Label>
-      {children ?? <span className="text-sm text-slate-200">{value ?? "—"}</span>}
+      {children ?? <span className="text-sm text-slate-700">{value ?? "—"}</span>}
     </div>
   );
 }
@@ -192,24 +192,24 @@ export function Modal({
   const sizes = { sm: "max-w-md", md: "max-w-lg", lg: "max-w-2xl" };
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
         className={cn(
-          "w-full rounded-t-2xl border border-white/10 bg-ink-850 shadow-2xl animate-scale-in sm:rounded-2xl",
+          "w-full rounded-t-2xl border border-slate-200 bg-white shadow-2xl animate-scale-in sm:rounded-2xl",
           sizes[size]
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between border-b border-white/5 px-5 py-4">
+        <div className="flex items-start justify-between border-b border-slate-100 px-5 py-4">
           <div>
-            {title && <h3 className="text-base font-semibold text-slate-100">{title}</h3>}
-            {description && <p className="mt-0.5 text-xs text-slate-500">{description}</p>}
+            {title && <h3 className="text-base font-semibold text-slate-900">{title}</h3>}
+            {description && <p className="mt-0.5 text-xs text-slate-9000">{description}</p>}
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-white/5 hover:text-slate-200"
+            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
             aria-label="Close"
           >
             ✕
@@ -224,7 +224,7 @@ export function Modal({
 export function Spinner({ className = "" }: { className?: string }) {
   return (
     <div className={cn("flex items-center justify-center py-10", className)}>
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-brand-500" />
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-brand-500" />
     </div>
   );
 }
@@ -232,7 +232,7 @@ export function Spinner({ className = "" }: { className?: string }) {
 export function ErrorMsg({ msg }: { msg?: string | null }) {
   if (!msg) return null;
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-300">
+    <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-700">
       <span>⚠</span>
       <span>{msg}</span>
     </div>
@@ -242,9 +242,9 @@ export function ErrorMsg({ msg }: { msg?: string | null }) {
 export function EmptyState({ title, hint }: { title: string; hint?: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-xl">📭</div>
-      <p className="text-sm font-medium text-slate-300">{title}</p>
-      {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-xl">📭</div>
+      <p className="text-sm font-medium text-slate-600">{title}</p>
+      {hint && <p className="mt-1 text-xs text-slate-9000">{hint}</p>}
     </div>
   );
 }
@@ -268,7 +268,7 @@ export function PageHeader({
         {onBack && (
           <button
             onClick={onBack}
-            className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-100 sm:inline-flex"
+            className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900 sm:inline-flex"
             aria-label="Go back"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -277,13 +277,13 @@ export function PageHeader({
           </button>
         )}
         {icon && (
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-500/10 text-xl text-brand-300 ring-1 ring-inset ring-brand-500/20">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-500/10 text-xl text-brand-700 ring-1 ring-inset ring-brand-500/20">
             {icon}
           </span>
         )}
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-bold tracking-tight text-slate-50 sm:text-2xl">{title}</h1>
-          {description && <p className="mt-1 truncate text-sm text-slate-400">{description}</p>}
+          <h1 className="truncate text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">{title}</h1>
+          {description && <p className="mt-1 truncate text-sm text-slate-500">{description}</p>}
         </div>
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -331,7 +331,7 @@ export function DataTable({
         </td>
       )}
       {columns.map((c) => (
-        <td key={c.key} className={cn("py-3 text-slate-300", c.className)}>
+        <td key={c.key} className={cn("py-3 text-slate-600", c.className)}>
           {c.render ? c.render(row) : row[c.key]}
         </td>
       ))}
@@ -350,8 +350,8 @@ export function DataTable({
         }}
         onClick={() => (onRowClick ? onRowClick(row) : undefined)}
         className={cn(
-          "rounded-xl border border-white/10 bg-white/[0.02] p-3.5 transition-colors",
-          isSelected ? "border-brand-500/50 bg-brand-500/[0.06]" : "hover:border-white/20 hover:bg-white/[0.04]",
+          "rounded-xl border border-slate-200 bg-white p-3.5 transition-colors",
+          isSelected ? "border-brand-500/50 bg-brand-50" : "hover:border-slate-300 hover:bg-slate-100",
           onRowClick && "cursor-pointer"
         )}
       >
@@ -359,10 +359,10 @@ export function DataTable({
           <div className="min-w-0 flex-1 space-y-1.5">
             {columns.map((c) => (
               <div key={c.key} className="flex items-center justify-between gap-3">
-                <span className="shrink-0 text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                <span className="shrink-0 text-[11px] font-medium uppercase tracking-wide text-slate-9000">
                   {c.header}
                 </span>
-                <span className="truncate text-right text-sm text-slate-200">
+                <span className="truncate text-right text-sm text-slate-700">
                   {c.render ? c.render(row) : row[c.key]}
                 </span>
               </div>
@@ -396,10 +396,10 @@ export function DataTable({
           key={getRowKey(row)}
           onClick={onRowClick ? () => onRowClick(row) : undefined}
           className={cn(
-            "border-t border-white/5 transition-colors odd:bg-white/[0.015]",
+            "border-t border-slate-100 transition-colors odd:bg-slate-50",
             selectedKeys.includes(getRowKey(row))
-              ? "bg-brand-500/[0.07]"
-              : "hover:bg-white/[0.04]",
+              ? "bg-brand-50"
+              : "hover:bg-slate-100",
             onRowClick && "cursor-pointer"
           )}
           variants={{
@@ -418,7 +418,7 @@ export function DataTable({
       <div className={cn("table-wrap", responsive && "hidden md:block")}>
         <table className="w-full min-w-[640px] text-sm">
            <thead>
-             <tr className="text-left text-[11px] uppercase tracking-[0.08em] text-slate-500">
+             <tr className="text-left text-[11px] uppercase tracking-[0.08em] text-slate-9000">
                {selectable && onSelectAll && (
                  <th className="whitespace-nowrap py-3 font-medium w-10">
                    <input
@@ -464,27 +464,27 @@ export function StatCard({
   delta?: { value: string; positive?: boolean };
 }) {
   const accents: Record<string, string> = {
-    brand: "from-brand-600/30 to-brand-500/5 text-brand-300 shadow-brand-500/20",
-    emerald: "from-emerald-600/30 to-emerald-500/5 text-emerald-300 shadow-emerald-500/20",
-    amber: "from-amber-600/30 to-amber-500/5 text-amber-300 shadow-amber-500/20",
-    sky: "from-sky-600/30 to-sky-500/5 text-sky-300 shadow-sky-500/20",
-    violet: "from-violet-600/30 to-violet-500/5 text-violet-300 shadow-violet-500/20",
+    brand: "from-brand-600/30 to-brand-500/5 text-brand-700 shadow-brand-500/20",
+    emerald: "from-emerald-600/30 to-emerald-500/5 text-emerald-700 shadow-emerald-500/20",
+    amber: "from-amber-600/30 to-amber-500/5 text-amber-700 shadow-amber-500/20",
+    sky: "from-sky-600/30 to-sky-500/5 text-sky-700 shadow-sky-500/20",
+    violet: "from-violet-600/30 to-violet-500/5 text-violet-700 shadow-violet-500/20",
   };
   return (
     <div className="card relative overflow-hidden p-4 sm:p-5 group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
       <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-50 transition-opacity duration-300 group-hover:opacity-90", accents[accent].split(" ").slice(0, 2).join(" "))} />
       <div className="relative flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wide text-slate-400 group-hover:text-slate-300 transition-colors truncate">{label}</p>
-          <p className="mt-1.5 sm:mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-50 truncate">{value}</p>
+          <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wide text-slate-500 group-hover:text-slate-600 transition-colors truncate">{label}</p>
+          <p className="mt-1.5 sm:mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 truncate">{value}</p>
           {delta && (
-            <p className={cn("mt-1 text-xs font-medium", delta.positive ? "text-emerald-400" : "text-red-400")}>
+            <p className={cn("mt-1 text-xs font-medium", delta.positive ? "text-emerald-600" : "text-red-600")}>
               {delta.positive ? "▲" : "▼"} {delta.value}
             </p>
           )}
         </div>
         {icon && (
-          <div className={cn("flex h-9 w-9 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-white/[0.06] text-base sm:text-xl backdrop-blur-md shadow-lg ring-1 ring-inset ring-white/10 transition-transform duration-300 group-hover:scale-110", accents[accent].split(" ")[2])}>
+          <div className={cn("flex h-9 w-9 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-slate-100 text-base sm:text-xl backdrop-blur-md shadow-lg ring-1 ring-inset ring-slate-200 transition-transform duration-300 group-hover:scale-110", accents[accent].split(" ")[2])}>
             {icon}
           </div>
         )}
@@ -509,21 +509,21 @@ export function SlideOver({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm transition-opacity"
+      className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-sm transition-opacity"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl h-full bg-ink-900 border-l border-white/10 shadow-2xl flex flex-col animate-slide-in-right overflow-hidden"
+        className="w-full max-w-3xl h-full bg-white border-l border-slate-200 shadow-2xl flex flex-col animate-slide-in-right overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between border-b border-white/5 px-6 py-5 bg-ink-950/50">
+        <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5 bg-slate-50/80">
           <div>
-            {title && <h3 className="text-xl font-bold text-slate-100">{title}</h3>}
-            {description && <p className="mt-1 text-sm text-slate-400">{description}</p>}
+            {title && <h3 className="text-xl font-bold text-slate-900">{title}</h3>}
+            {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
           </div>
           <button
             onClick={onClose}
-            className="rounded-xl p-2 text-slate-400 transition hover:bg-white/10 hover:text-slate-200"
+            className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700"
             aria-label="Close"
           >
             ✕
@@ -545,7 +545,7 @@ export function Tabs({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="flex space-x-1 border-b border-white/10 overflow-x-auto no-scrollbar">
+    <div className="flex space-x-1 border-b border-slate-200 overflow-x-auto no-scrollbar">
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -553,8 +553,8 @@ export function Tabs({
           className={cn(
             "flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap",
             activeTab === tab.id
-              ? "border-brand-500 text-brand-400"
-              : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded-t-lg"
+              ? "border-brand-500 text-brand-600"
+              : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-t-lg"
           )}
         >
           {tab.icon && <span className="text-lg">{tab.icon}</span>}
@@ -635,7 +635,7 @@ export function TimePickerModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" 
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm" 
           onClick={onClose}
         >
           <motion.div 
@@ -644,7 +644,7 @@ export function TimePickerModal({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 10 }}
             transition={{ type: "spring", damping: 25, stiffness: 400 }}
-            className="w-full max-w-[320px] max-h-[90vh] flex flex-col rounded-2xl bg-ink-900 shadow-2xl overflow-hidden border border-white/10" 
+            className="w-full max-w-[320px] max-h-[90vh] flex flex-col rounded-2xl bg-white shadow-2xl overflow-hidden border border-slate-200" 
             onClick={e => e.stopPropagation()}
           >
         <div className="flex items-center justify-center gap-6 bg-brand-600 p-6">
@@ -660,7 +660,7 @@ export function TimePickerModal({
            <div className="flex flex-col gap-1.5 text-sm font-semibold">
              <button 
                type="button" 
-               className={cn("rounded-md px-2.5 py-1 transition-colors", !isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} 
+               className={cn("rounded-md px-2.5 py-1 transition-colors", !isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-slate-200")} 
                onClick={(e) => {
                  e.preventDefault();
                  e.stopPropagation();
@@ -671,7 +671,7 @@ export function TimePickerModal({
              </button>
              <button 
                type="button" 
-               className={cn("rounded-md px-2.5 py-1 transition-colors", isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-white/10")} 
+               className={cn("rounded-md px-2.5 py-1 transition-colors", isPM ? "bg-white text-brand-600 shadow-md" : "text-white/70 hover:bg-slate-200")} 
                onClick={(e) => {
                  e.preventDefault();
                  e.stopPropagation();
@@ -683,9 +683,9 @@ export function TimePickerModal({
            </div>
         </div>
 
-        <div className="flex justify-center p-4 sm:p-8 bg-ink-950 flex-1 overflow-y-auto min-h-0">
+        <div className="flex justify-center p-4 sm:p-8 bg-slate-50 flex-1 overflow-y-auto min-h-0">
            <div 
-             className="relative h-[260px] w-[260px] rounded-full bg-white/[0.03] shadow-inner ring-1 ring-white/5"
+             className="relative h-[260px] w-[260px] rounded-full bg-slate-50 shadow-inner ring-1 ring-slate-100"
              onPointerDown={(e) => {
                (e.target as HTMLElement).setPointerCapture(e.pointerId);
                handleClockAction(e, false);
@@ -721,7 +721,7 @@ export function TimePickerModal({
                     key={n}
                     className={cn(
                       "absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-sm pointer-events-none transition-colors",
-                      isActive ? "text-white font-bold" : "text-slate-400"
+                      isActive ? "text-white font-bold" : "text-slate-500"
                     )}
                     style={{ left: x, top: y }}
                   >
@@ -732,7 +732,7 @@ export function TimePickerModal({
            </div>
         </div>
 
-        <div className="flex shrink-0 justify-end gap-3 p-4 bg-ink-950 border-t border-white/5">
+        <div className="flex shrink-0 justify-end gap-3 p-4 bg-slate-50 border-t border-slate-100">
            <Button variant="ghost" onClick={onClose}>Cancel</Button>
            <Button variant="primary" onClick={() => {
               onChange(`${pad(tempH)}:${pad(tempM)}`);
@@ -765,8 +765,8 @@ export function TimePicker({ value, onChange, className = "" }: { value: string;
         className={cn("input-base flex items-center justify-between cursor-pointer select-none", className)}
         onClick={() => setOpen(true)}
       >
-        <span className={value ? "text-slate-100" : "text-slate-500"}>{displayVal}</span>
-        <span className="text-slate-400">🕒</span>
+        <span className={value ? "text-slate-900" : "text-slate-9000"}>{displayVal}</span>
+        <span className="text-slate-500">🕒</span>
       </div>
       <TimePickerModal open={open} onClose={() => setOpen(false)} value={value} onChange={onChange} />
     </>

@@ -132,7 +132,7 @@ export default function SettingsPage() {
           <div className="table-wrap">
             <table className="w-full min-w-[640px] text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
                   <th className="py-2.5">Key</th>
                   <th>Value</th>
                   <th>Description</th>
@@ -141,9 +141,9 @@ export default function SettingsPage() {
               </thead>
               <tbody>
                 {settings.map((s: any) => (
-                  <tr key={s.key} className="border-t border-white/5 hover:bg-white/[0.02]">
-                    <td className="py-3 font-mono text-slate-100">{s.key}</td>
-                    <td className="py-3 text-slate-200 max-w-[200px] truncate">{s.value ?? "—"}</td>
+                  <tr key={s.key} className="border-t border-slate-100 hover:bg-slate-50">
+                    <td className="py-3 font-mono text-slate-900">{s.key}</td>
+                    <td className="py-3 text-slate-700 max-w-[200px] truncate">{s.value ?? "—"}</td>
                     <td className="py-3 text-slate-400 text-xs max-w-[300px] truncate">{s.description ?? "—"}</td>
                     <td className="py-3 text-right">
                       <Button size="sm" variant="outline" onClick={() => openEdit(s)}>Edit</Button>

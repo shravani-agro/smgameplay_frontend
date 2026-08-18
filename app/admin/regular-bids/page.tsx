@@ -126,7 +126,7 @@ export default function RegularBidDataPage() {
         }
       />
 
-      <div className="flex flex-wrap gap-4 items-center bg-ink-900 p-4 rounded-xl border border-white/5 shadow-sm">
+      <div className="flex flex-wrap gap-4 items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
         <div className="flex flex-col gap-1 w-full sm:w-48">
           <label className="text-xs font-medium text-slate-400">Date</label>
           <input
@@ -163,17 +163,17 @@ export default function RegularBidDataPage() {
             {BET_TYPES.map((bt) => {
               const items = getGroupedData(bt.key);
               return (
-                <div key={bt.key} className="bg-ink-950 rounded-xl p-4 border border-white/5">
-                  <h4 className="text-sm font-semibold text-slate-200 mb-3 border-b border-white/10 pb-2">
+                <div key={bt.key} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                  <h4 className="text-sm font-semibold text-slate-700 mb-3 border-b border-slate-200 pb-2">
                     {bt.label}
                   </h4>
                   {items.length === 0 ? (
-                    <div className="text-slate-500 text-sm">0</div>
+                    <div className="text-slate-400 text-sm">0</div>
                   ) : (
                     <div className="space-y-1">
                       {items.map((item) => (
-                        <div key={item.selected_number} className="flex justify-between items-center text-sm border-b border-white/5 pb-1 last:border-0 last:pb-0">
-                          <span className="text-slate-300 font-medium">{item.selected_number}</span>
+                        <div key={item.selected_number} className="flex justify-between items-center text-sm border-b border-slate-100 pb-1 last:border-0 last:pb-0">
+                          <span className="text-slate-600 font-medium">{item.selected_number}</span>
                           <span className="text-brand-400 font-semibold">{item.total_amount}</span>
                         </div>
                       ))}
