@@ -8,49 +8,95 @@ import { Button, Spinner, cn } from "@/components/ui";
 import { ToastContainer } from "@/components/Toast";
 import { CommandPalette } from "@/components/CommandPalette";
 
-const NAV = [
-  { href: "/admin", label: "Dashboard", icon: "▦" },
-  { href: "/admin/users", label: "Users", icon: "👤" },
-  { href: "/admin/markets", label: "Markets", icon: "📈" },
-  { href: "/admin/starline", label: "Starline", icon: "⭐" },
-  { href: "/admin/results", label: "Results", icon: "🎯" },
-  { href: "/admin/deposits", label: "Deposits", icon: "➕" },
-  { href: "/admin/bids", label: "Regular Bids History", icon: "🎲" },
-  { href: "/admin/starline-bids-history", label: "Starline Bids History", icon: "🎲" },
-  { href: "/admin/regular-bids", label: "Regular Bid Data", icon: "📊" },
-  { href: "/admin/starline-bids", label: "Starline Bid Data", icon: "📈" },
-  { href: "/admin/withdrawals", label: "Withdrawals", icon: "💸" },
-  { href: "/admin/game-rates", label: "Game Rates", icon: "💰" },
-  { href: "/admin/audit", label: "Audit Logs", icon: "🛡" },
-  { href: "/admin/settings", label: "Settings", icon: "⚙" },
+type NavItem = { href: string; label: string; icon: string };
+type NavGroup = { label: string; items: NavItem[] };
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [{ href: "/admin", label: "Dashboard", icon: "▦" }],
+  },
+  {
+    label: "Operations",
+    items: [
+      { href: "/admin/users", label: "Users", icon: "👤" },
+      { href: "/admin/markets", label: "Markets", icon: "📈" },
+      { href: "/admin/starline", label: "Starline", icon: "⭐" },
+      { href: "/admin/results", label: "Results", icon: "🎯" },
+    ],
+  },
+  {
+    label: "Bids",
+    items: [
+      { href: "/admin/bids", label: "Regular Bids History", icon: "🎲" },
+      { href: "/admin/starline-bids-history", label: "Starline Bids History", icon: "🎲" },
+      { href: "/admin/regular-bids", label: "Regular Bid Data", icon: "📊" },
+      { href: "/admin/starline-bids", label: "Starline Bid Data", icon: "📈" },
+    ],
+  },
+  {
+    label: "Finance",
+    items: [
+      { href: "/admin/deposits", label: "Deposits", icon: "➕" },
+      { href: "/admin/withdrawals", label: "Withdrawals", icon: "💸" },
+      { href: "/admin/game-rates", label: "Game Rates", icon: "💰" },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { href: "/admin/audit", label: "Audit Logs", icon: "🛡" },
+      { href: "/admin/settings", label: "Settings", icon: "⚙" },
+    ],
+  },
 ];
+
+const ALL_NAV: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
+
+function isActive(item: NavItem, pathname: string) {
+  return item.href === "/admin"
+    ? pathname === "/admin"
+    : pathname === item.href || pathname.startsWith(item.href + "/");
+}
 
 function NavContent({
   pathname,
+  query,
   onNavigate,
 }: {
   pathname: string;
+  query: string;
   onNavigate?: () => void;
 }) {
+  const q = query.trim().toLowerCase();
+  const groups = q
+    ? [{ label: "", items: ALL_NAV.filter((i) => i.label.toLowerCase().includes(q)) }]
+    : NAV_GROUPS;
+
   return (
-    <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-      {NAV.map((item) => {
-        const active =
-          item.href === "/admin"
-            ? pathname === "/admin"
-            : pathname === item.href || pathname.startsWith(item.href + "/");
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onNavigate}
-            className={cn("nav-link", active && "nav-link-active")}
-          >
-            <span className="w-5 text-center text-base leading-none">{item.icon}</span>
-            <span>{item.label}</span>
-          </Link>
-        );
-      })}
+    <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-3">
+      {groups.map((group) => (
+        <div key={group.label || "search"}>
+          {group.label && <div className="section-label">{group.label}</div>}
+          {group.items.map((item) => {
+            const active = isActive(item, pathname);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onNavigate}
+                className={cn("nav-link", active && "nav-link-active")}
+              >
+                <span className="w-5 text-center text-base leading-none">{item.icon}</span>
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      ))}
+      {q && groups[0].items.length === 0 && (
+        <p className="px-3 py-6 text-center text-sm text-slate-500">No matching pages</p>
+      )}
     </nav>
   );
 }
@@ -64,6 +110,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [navQuery, setNavQuery] = useState("");
 
   useEffect(() => {
     if (!loading && !authenticated) {
@@ -95,7 +142,18 @@ export default function DashboardLayout({
             Satta<span className="text-brand-400">Admin</span>
           </span>
         </div>
-        <NavContent pathname={pathname} />
+        <div className="px-3 pb-2">
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">🔍</span>
+            <input
+              value={navQuery}
+              onChange={(e) => setNavQuery(e.target.value)}
+              placeholder="Search pages…"
+              className="w-full rounded-xl border border-white/10 bg-black/40 py-2 pl-9 pr-3 text-sm text-slate-200 placeholder:text-slate-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-4 focus:ring-brand-500/15"
+            />
+          </div>
+        </div>
+        <NavContent pathname={pathname} query={navQuery} />
         <div className="border-t border-white/5 p-3">
           <div className="px-2 pb-1 text-[11px] uppercase tracking-wide text-slate-500">
             Signed in as
@@ -122,7 +180,7 @@ export default function DashboardLayout({
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between px-5 py-5">
+           <div className="flex items-center justify-between px-5 py-5">
             <div className="flex items-center gap-2">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl shadow-glow ring-1 ring-brand-500/20">
                 <img src="/logo.jpg" alt="SattaAdmin Logo" className="h-full w-full object-cover" />
@@ -139,7 +197,18 @@ export default function DashboardLayout({
               ✕
             </button>
           </div>
-          <NavContent pathname={pathname} onNavigate={() => setOpen(false)} />
+          <div className="px-3 pb-2">
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">🔍</span>
+              <input
+                value={navQuery}
+                onChange={(e) => setNavQuery(e.target.value)}
+                placeholder="Search pages…"
+                className="w-full rounded-xl border border-white/10 bg-black/40 py-2 pl-9 pr-3 text-sm text-slate-200 placeholder:text-slate-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-4 focus:ring-brand-500/15"
+              />
+            </div>
+          </div>
+          <NavContent pathname={pathname} query={navQuery} onNavigate={() => setOpen(false)} />
           <div className="border-t border-white/5 p-3">
             <div className="px-2 pb-1 text-[11px] uppercase tracking-wide text-slate-500">
               Signed in as
@@ -169,11 +238,11 @@ export default function DashboardLayout({
             <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg lg:hidden shadow-sm ring-1 ring-brand-500/20">
               <img src="/logo.jpg" alt="SattaAdmin Logo" className="h-full w-full object-cover" />
             </div>
-            <h1 className="text-sm font-semibold text-slate-200">
-              {NAV.find((n) =>
-                n.href === "/admin" ? pathname === "/admin" : (pathname === n.href || pathname.startsWith(n.href + "/"))
-              )?.label ?? "Dashboard"}
-            </h1>
+             <h1 className="text-sm font-semibold text-slate-200">
+               {ALL_NAV.find((n) =>
+                 n.href === "/admin" ? pathname === "/admin" : (pathname === n.href || pathname.startsWith(n.href + "/"))
+               )?.label ?? "Dashboard"}
+             </h1>
           </div>
           <div className="flex items-center gap-2">
             <span className="hidden items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs text-slate-300 sm:flex">

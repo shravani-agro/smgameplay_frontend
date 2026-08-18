@@ -10,6 +10,7 @@ export function cn(...parts: Array<string | false | null | undefined>) {
 export function Card({
   title,
   subtitle,
+  icon,
   children,
   actions,
   className = "",
@@ -17,6 +18,7 @@ export function Card({
 }: {
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
+  icon?: React.ReactNode;
   children: React.ReactNode;
   actions?: React.ReactNode;
   className?: string;
@@ -25,10 +27,17 @@ export function Card({
   return (
     <div className={cn("card animate-fade-in group hover:border-white/20 transition-all duration-300", className)}>
       {(title || actions) && (
-        <div className="flex flex-col gap-3 border-b border-white/5 px-5 py-4 sm:flex-row sm:items-center sm:justify-between bg-white/[0.01]">
-          <div>
-            {title && <h3 className="text-base font-semibold text-slate-100">{title}</h3>}
-            {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
+        <div className="flex flex-col gap-3 border-b border-white/5 px-5 py-4 sm:flex-row sm:items-center sm:justify-between bg-white/[0.015]">
+          <div className="flex min-w-0 items-center gap-3">
+            {icon && (
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-base text-brand-300 ring-1 ring-inset ring-white/10">
+                {icon}
+              </span>
+            )}
+            <div className="min-w-0">
+              {title && <h3 className="truncate text-base font-semibold text-slate-100">{title}</h3>}
+              {subtitle && <p className="mt-0.5 truncate text-xs text-slate-500">{subtitle}</p>}
+            </div>
           </div>
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </div>
@@ -44,18 +53,20 @@ export function Button({
   size = "md",
   className = "",
   type = "button",
+  loading = false,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "secondary" | "danger" | "success" | "ghost" | "outline";
   size?: "sm" | "md" | "lg" | "icon";
+  loading?: boolean;
 }) {
   const variants: Record<string, string> = {
-    primary: "bg-brand-600 hover:bg-brand-500 text-white shadow-glow",
-    secondary: "bg-ink-700 hover:bg-ink-600 text-slate-100",
-    danger: "bg-red-600 hover:bg-red-500 text-white",
-    success: "bg-emerald-600 hover:bg-emerald-500 text-white",
-    ghost: "bg-transparent hover:bg-white/5 text-slate-300",
-    outline: "border border-white/10 bg-transparent hover:bg-white/5 text-slate-200",
+    primary: "bg-brand-600 hover:bg-brand-500 text-white shadow-glow focus-visible:ring-brand-500/40",
+    secondary: "bg-ink-700 hover:bg-ink-600 text-slate-100 focus-visible:ring-white/20",
+    danger: "bg-red-600 hover:bg-red-500 text-white focus-visible:ring-red-500/40",
+    success: "bg-emerald-600 hover:bg-emerald-500 text-white focus-visible:ring-emerald-500/40",
+    ghost: "bg-transparent hover:bg-white/5 text-slate-300 focus-visible:ring-white/20",
+    outline: "border border-white/10 bg-transparent hover:bg-white/5 text-slate-200 focus-visible:ring-white/20",
   };
   const sizes: Record<string, string> = {
     sm: "h-8 px-3 text-xs",
@@ -66,14 +77,18 @@ export function Button({
   return (
     <button
       type={type}
+      disabled={loading || props.disabled}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]",
+        "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 active:scale-[0.98]",
         variants[variant],
         sizes[size],
         className
       )}
       {...props}
     >
+      {loading && (
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current" />
+      )}
       {children}
     </button>
   );
@@ -238,16 +253,38 @@ export function PageHeader({
   title,
   description,
   actions,
+  icon,
+  onBack,
 }: {
   title: React.ReactNode;
   description?: React.ReactNode;
   actions?: React.ReactNode;
+  icon?: React.ReactNode;
+  onBack?: () => void;
 }) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight text-slate-50 sm:text-2xl">{title}</h1>
-        {description && <p className="mt-1 text-sm text-slate-400">{description}</p>}
+      <div className="flex min-w-0 items-center gap-3">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-100 sm:inline-flex"
+            aria-label="Go back"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
+        {icon && (
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-500/10 text-xl text-brand-300 ring-1 ring-inset ring-brand-500/20">
+            {icon}
+          </span>
+        )}
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-bold tracking-tight text-slate-50 sm:text-2xl">{title}</h1>
+          {description && <p className="mt-1 truncate text-sm text-slate-400">{description}</p>}
+        </div>
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -359,10 +396,10 @@ export function DataTable({
           key={getRowKey(row)}
           onClick={onRowClick ? () => onRowClick(row) : undefined}
           className={cn(
-            "border-t border-white/5 transition-colors",
+            "border-t border-white/5 transition-colors odd:bg-white/[0.015]",
             selectedKeys.includes(getRowKey(row))
               ? "bg-brand-500/[0.07]"
-              : "hover:bg-white/[0.03]",
+              : "hover:bg-white/[0.04]",
             onRowClick && "cursor-pointer"
           )}
           variants={{
@@ -380,25 +417,25 @@ export function DataTable({
     <div>
       <div className={cn("table-wrap", responsive && "hidden md:block")}>
         <table className="w-full min-w-[640px] text-sm">
-          <thead>
-            <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
-              {selectable && onSelectAll && (
-                <th className="whitespace-nowrap py-2.5 font-medium w-10">
-                  <input
-                    type="checkbox"
-                    className="accent-brand-600"
-                    checked={allSelected}
-                    onChange={(e) => onSelectAll(e.target.checked)}
-                  />
-                </th>
-              )}
-              {columns.map((c) => (
-                <th key={c.key} className={cn("whitespace-nowrap py-2.5 font-medium", c.className)}>
-                  {c.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
+           <thead>
+             <tr className="text-left text-[11px] uppercase tracking-[0.08em] text-slate-500">
+               {selectable && onSelectAll && (
+                 <th className="whitespace-nowrap py-3 font-medium w-10">
+                   <input
+                     type="checkbox"
+                     className="accent-brand-600"
+                     checked={allSelected}
+                     onChange={(e) => onSelectAll(e.target.checked)}
+                   />
+                 </th>
+               )}
+               {columns.map((c) => (
+                 <th key={c.key} className={cn("whitespace-nowrap py-3 font-medium", c.className)}>
+                   {c.header}
+                 </th>
+               ))}
+             </tr>
+           </thead>
           {tableBody}
         </table>
         {rows.length === 0 && (empty ?? <EmptyState title="No records found" />)}
@@ -435,11 +472,11 @@ export function StatCard({
   };
   return (
     <div className="card relative overflow-hidden p-4 sm:p-5 group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
-      <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-60 transition-opacity duration-300 group-hover:opacity-100", accents[accent].split(" ").slice(0, 2).join(" "))} />
+      <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-50 transition-opacity duration-300 group-hover:opacity-90", accents[accent].split(" ").slice(0, 2).join(" "))} />
       <div className="relative flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wide text-slate-400 group-hover:text-slate-300 transition-colors truncate">{label}</p>
-          <p className="mt-1 sm:mt-1.5 text-2xl sm:text-3xl font-bold text-slate-50 truncate">{value}</p>
+          <p className="mt-1.5 sm:mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-50 truncate">{value}</p>
           {delta && (
             <p className={cn("mt-1 text-xs font-medium", delta.positive ? "text-emerald-400" : "text-red-400")}>
               {delta.positive ? "▲" : "▼"} {delta.value}
@@ -447,7 +484,7 @@ export function StatCard({
           )}
         </div>
         {icon && (
-          <div className={cn("flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-white/10 text-base sm:text-xl backdrop-blur-md shadow-lg transition-transform duration-300 group-hover:scale-110", accents[accent].split(" ")[2])}>
+          <div className={cn("flex h-9 w-9 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-white/[0.06] text-base sm:text-xl backdrop-blur-md shadow-lg ring-1 ring-inset ring-white/10 transition-transform duration-300 group-hover:scale-110", accents[accent].split(" ")[2])}>
             {icon}
           </div>
         )}
