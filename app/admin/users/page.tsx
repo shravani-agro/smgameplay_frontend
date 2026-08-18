@@ -264,7 +264,7 @@ export default function UsersPage() {
                 header: "Username",
                 render: (u) => (
                   <span className="font-medium text-slate-100">
-                    {u.username}
+                    {u.full_name || u.username}
                     {u.username === "admin" && <Badge color="brand" className="ml-2">Owner</Badge>}
                     {u.auth_provider === "google" && <Badge color="blue" className="ml-2">Google signed in</Badge>}
                   </span>
@@ -298,7 +298,7 @@ export default function UsersPage() {
       <SlideOver
         open={!!selected}
         onClose={() => setSelected(null)}
-        title={selected?.username}
+        title={selected?.full_name || selected?.username}
         description={`ID: ${selected?.id} • ${selected?.phone}`}
       >
         {selected && (
@@ -589,7 +589,7 @@ export default function UsersPage() {
       </SlideOver>
 
       {/* Bonus modal */}
-      <Modal open={!!bonusUser} onClose={() => setBonusUser(null)} title={`Add Bonus — ${bonusUser?.username ?? ""}`}>
+      <Modal open={!!bonusUser} onClose={() => setBonusUser(null)} title={`Add Bonus — ${bonusUser?.full_name || bonusUser?.username || ""}`}>
         <div className="space-y-4">
           <Field label="Amount">
             <Input type="number" value={bonusAmount} onChange={(e) => setBonusAmount(e.target.value)} />
@@ -605,7 +605,7 @@ export default function UsersPage() {
       </Modal>
 
       {/* Deduct modal */}
-      <Modal open={!!deductUser} onClose={() => setDeductUser(null)} title={`Deduct Funds — ${deductUser?.username ?? ""}`}>
+      <Modal open={!!deductUser} onClose={() => setDeductUser(null)} title={`Deduct Funds — ${deductUser?.full_name || deductUser?.username || ""}`}>
         <div className="space-y-4">
           <Field label="Amount">
             <Input type="number" value={deductAmount} onChange={(e) => setDeductAmount(e.target.value)} />
@@ -621,7 +621,7 @@ export default function UsersPage() {
       </Modal>
 
       {/* Reset password modal */}
-      <Modal open={!!resetUser} onClose={() => setResetUser(null)} title={`Reset Password — ${resetUser?.username ?? ""}`}>
+      <Modal open={!!resetUser} onClose={() => setResetUser(null)} title={`Reset Password — ${resetUser?.full_name || resetUser?.username || ""}`}>
         <div className="space-y-4">
           <Field label="New Password">
             <Input value={resetPw} onChange={(e) => setResetPw(e.target.value)} placeholder="Enter new password" />
