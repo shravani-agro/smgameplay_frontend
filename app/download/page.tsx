@@ -119,7 +119,7 @@ export default function DownloadPage() {
                 
                 <div className="space-y-4 flex-1">
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-16 w-full bg-white/5 rounded-xl border border-white/10 flex items-center px-4 gap-4 animate-pulse" style={{ animationDelay: \`\${i * 0.1}s\` }}>
+                    <div key={i} className="h-16 w-full bg-white/5 rounded-xl border border-white/10 flex items-center px-4 gap-4 animate-pulse" style={{ animationDelay: `${i * 0.1}s` }}>
                       <div className="w-10 h-10 rounded-full bg-slate-700/50"></div>
                       <div className="flex-1 space-y-2">
                         <div className="h-3 w-full bg-slate-700/50 rounded-full"></div>
