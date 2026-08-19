@@ -7,9 +7,8 @@ import Link from "next/link";
 
 export default function DownloadPage() {
   const handleDownload = () => {
-    // Trigger download - adjust the URL to the actual APK file path when available
     const link = document.createElement("a");
-    link.href = "/sm-booking-app.apk"; // Ensure you place your APK in the public folder
+    link.href = "https://github.com/shravani-agro/smgameplay_frontend/releases/latest/download/smgameplay.apk";
     link.download = "SM_Booking_Official.apk";
     document.body.appendChild(link);
     link.click();
