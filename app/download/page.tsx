@@ -47,11 +47,11 @@ export default function DownloadPage() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-900/30 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-6 py-16 lg:py-24 relative z-10">
-        
+
         {/* Hero Section */}
         <div className="flex flex-col lg:flex-row items-center justify-between gap-16 mb-24">
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
@@ -64,21 +64,21 @@ export default function DownloadPage() {
               </span>
               v2.1.0 is Now Available
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
               Experience the Best <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-orange-500">
                 Satta Matka App
               </span>
             </h1>
-            
+
             <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Download the official SM Booking app for lightning-fast results, 
+              Download the official SM Booking app for lightning-fast results,
               expert guessing, and secure gameplay. Join thousands of winners today.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-              <button 
+              <button
                 onClick={handleDownload}
                 className="group relative px-8 py-4 bg-gradient-to-r from-brand-600 to-brand-500 rounded-2xl font-bold text-white text-lg shadow-glow hover:shadow-[0_0_30px_rgba(244,63,94,0.5)] transition-all duration-300 transform hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-3"
               >
@@ -86,14 +86,14 @@ export default function DownloadPage() {
                 Download App Now
                 <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </button>
-              
+
               <p className="text-sm text-slate-500 font-medium">
                 Size: 12.4 MB &bull; For Android 8.0+
               </p>
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
@@ -105,7 +105,7 @@ export default function DownloadPage() {
               <div className="absolute top-0 inset-x-0 h-6 flex justify-center z-20">
                 <div className="w-1/3 h-full bg-ink-800 rounded-b-xl"></div>
               </div>
-              
+
               {/* Screen Content Mockup */}
               <div className="flex-1 p-6 flex flex-col relative z-10 bg-gradient-to-b from-ink-900 to-ink-950">
                 <div className="mt-8 mb-6">
@@ -115,7 +115,7 @@ export default function DownloadPage() {
                   <div className="h-4 w-32 bg-slate-700/50 rounded-full mx-auto mb-2"></div>
                   <div className="h-3 w-24 bg-slate-700/30 rounded-full mx-auto"></div>
                 </div>
-                
+
                 <div className="space-y-4 flex-1">
                   {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="h-16 w-full bg-white/5 rounded-xl border border-white/10 flex items-center px-4 gap-4 animate-pulse" style={{ animationDelay: `${i * 0.1}s` }}>
@@ -128,11 +128,11 @@ export default function DownloadPage() {
                   ))}
                 </div>
               </div>
-              
+
               {/* Screen Glare */}
               <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 pointer-events-none z-20" />
             </div>
-            
+
             {/* Floating elements behind phone */}
             <div className="absolute -z-10 top-1/4 -right-12 w-24 h-24 bg-brand-500/20 rounded-full blur-2xl animate-pulse-glow" />
             <div className="absolute -z-10 bottom-1/4 -left-12 w-32 h-32 bg-orange-500/20 rounded-full blur-2xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
@@ -140,7 +140,7 @@ export default function DownloadPage() {
         </div>
 
         {/* Features Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -172,7 +172,7 @@ export default function DownloadPage() {
             <h2 className="text-3xl font-bold text-white mb-4">How to Install</h2>
             <p className="text-slate-400">Follow these simple steps to get started</p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, idx) => (
               <div key={idx} className="relative">
