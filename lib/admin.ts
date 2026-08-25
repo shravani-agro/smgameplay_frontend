@@ -396,7 +396,12 @@ export async function sendSupportMessage(
   if (file) form.append("file", file);
   const res = await client.post(
     `/admin/support/conversations/${conversationId}/messages`,
-    form
+    form,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
   );
   return res.data;
 }
