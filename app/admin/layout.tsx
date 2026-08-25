@@ -43,6 +43,12 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    label: "Engagement",
+    items: [
+      { href: "/admin/support", label: "Support Chat", icon: "💬" },
+    ],
+  },
+  {
     label: "System",
     items: [
       { href: "/admin/audit", label: "Audit Logs", icon: "🛡" },

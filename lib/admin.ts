@@ -368,3 +368,43 @@ export async function deleteStarlineResult(resultId: number) {
   const res = await client.delete(`/admin/starline/results/${resultId}`);
   return res.data;
 }
+
+/* ---------------- Admin: Support Chat ---------------- */
+
+export async function getSupportStats() {
+  const res = await client.get("/admin/support/stats");
+  return res.data;
+}
+
+export async function listSupportConversations(params: any = {}) {
+  const res = await client.get("/admin/support/conversations", { params });
+  return res.data;
+}
+
+export async function getSupportConversation(conversationId: number) {
+  const res = await client.get(`/admin/support/conversations/${conversationId}`);
+  return res.data;
+}
+
+export async function sendSupportMessage(
+  conversationId: number,
+  message: string,
+  file?: File | null
+) {
+  const form = new FormData();
+  if (message) form.append("message", message);
+  if (file) form.append("file", file);
+  const res = await client.post(
+    `/admin/support/conversations/${conversationId}/messages`,
+    form
+  );
+  return res.data;
+}
+
+export async function setSupportStatus(conversationId: number, status: string) {
+  const res = await client.put(
+    `/admin/support/conversations/${conversationId}/status`,
+    { status }
+  );
+  return res.data;
+}
