@@ -28,8 +28,7 @@ import { parseApiError } from "@/lib/error-parser";
 const STATUSES: { id: string; label: string; color: string }[] = [
   { id: "", label: "All", color: "slate" },
   { id: "pending", label: "Pending", color: "amber" },
-  { id: "approved", label: "Approved", color: "emerald" },
-  { id: "processed", label: "Processed", color: "sky" },
+  { id: "processed", label: "Done (Paid)", color: "sky" },
   { id: "rejected", label: "Rejected", color: "red" },
 ];
 
@@ -138,7 +137,7 @@ export default function WithdrawalsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Withdrawals"
-        description="Send the money manually, then approve the request. Rejecting refunds the amount to the user's wallet"
+        description="Send the money manually to the user's provided bank/UPI, then Mark as Done. Rejecting refunds the amount to the user's wallet."
         actions={
           <div className="flex flex-wrap gap-2 items-center">
             <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-36 h-9 text-xs" />
@@ -192,7 +191,7 @@ export default function WithdrawalsPage() {
             <div className="flex items-center gap-2">
               <Button size="sm" variant="ghost" onClick={() => setSelected([])}>Clear</Button>
               <Button size="sm" variant="success" disabled={status !== "pending"} onClick={bulkApprove}>
-                Approve All
+                Mark Selected as Done
               </Button>
             </div>
           </motion.div>
@@ -259,8 +258,8 @@ export default function WithdrawalsPage() {
                         <Button size="sm" variant="outline" onClick={() => setDetail(w)}>View</Button>
                         {w.status === "pending" && (
                           <>
-                            <Button size="sm" variant="success" onClick={() => openConfirm(w.id, "approve")}>
-                              Approve
+                            <Button size="sm" variant="success" onClick={() => openConfirm(w.id, "process")}>
+                              Mark as Done
                             </Button>
                             <Button size="sm" variant="danger" onClick={() => openConfirm(w.id, "reject")}>
                               Reject
@@ -360,19 +359,8 @@ export default function WithdrawalsPage() {
 
             {detail.status === "pending" && (
               <div className="flex gap-2 pt-1">
-                <Button variant="success" className="flex-1" onClick={() => openConfirm(detail.id, "approve")}>
-                  Approve
-                </Button>
-                <Button variant="danger" className="flex-1" onClick={() => openConfirm(detail.id, "reject")}>
-                  Reject
-                </Button>
-              </div>
-            )}
-
-            {detail.status === "approved" && (
-              <div className="flex gap-2 pt-1">
                 <Button variant="success" className="flex-1" onClick={() => openConfirm(detail.id, "process")}>
-                  Process (Mark as Paid)
+                  Mark as Done (Paid)
                 </Button>
                 <Button variant="danger" className="flex-1" onClick={() => openConfirm(detail.id, "reject")}>
                   Reject
@@ -386,12 +374,11 @@ export default function WithdrawalsPage() {
       <Modal
         open={!!confirm}
         onClose={() => setConfirm(null)}
-        title={`${confirm?.action === "process" ? "Process" : confirm?.action === "approve" ? "Approve" : "Reject"} withdrawal`}
+        title={`${confirm?.action === "process" ? "Mark as Done" : confirm?.action === "approve" ? "Approve" : "Reject"} withdrawal`}
       >
         <p className="text-sm text-slate-600">
-          Are you sure you want to <b>{confirm?.action}</b> withdrawal request #{confirm?.id}?
-          {confirm?.action === "approve" && " Make sure you have already sent the money to the user."}
-          {confirm?.action === "process" && " This marks the request as paid. Make sure you have already sent the money to the user."}
+          Are you sure you want to <b>{confirm?.action === "process" ? "mark as done" : confirm?.action}</b> withdrawal request #{confirm?.id}?
+          {confirm?.action === "process" && " Make sure you have already sent the money to the user from your UPI/Bank."}
           {confirm?.action === "reject" && " The amount will be added back to the user's wallet."}
         </p>
         <div className="mt-5 flex justify-end gap-2">
