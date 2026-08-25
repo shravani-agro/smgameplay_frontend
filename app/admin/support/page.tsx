@@ -47,10 +47,26 @@ function formatDate(raw?: string) {
   });
 }
 
+import { API_BASE } from "@/lib/config";
+
 function attachmentSrc(url?: string) {
   if (!url) return "";
   if (url.startsWith("http")) return url;
-  if (typeof window !== "undefined") return window.location.origin + url;
+  
+  let base = API_BASE || "";
+  if (base.endsWith("/api")) {
+    base = base.substring(0, base.length - 4);
+  } else if (base.endsWith("/api/")) {
+    base = base.substring(0, base.length - 5);
+  }
+  
+  if (base && !base.startsWith("/")) {
+    return base + url;
+  }
+  
+  if (typeof window !== "undefined") {
+    return window.location.origin + base + url;
+  }
   return url;
 }
 
