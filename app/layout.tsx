@@ -105,7 +105,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <AuthProvider>{children}</AuthProvider>
         <Footer />
-        <VideoPopup />
+        {/* <VideoPopup /> */}
         <AgeGate />
       </body>
     </html>
