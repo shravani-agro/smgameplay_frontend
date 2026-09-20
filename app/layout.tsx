@@ -3,7 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import Footer from "@/components/Footer";
 import VideoPopup from "@/components/VideoPopup";
-import AgeGate from "@/components/AgeGate";
+// import AgeGate from "@/components/AgeGate";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://smgameplay.in"),
@@ -106,7 +106,7 @@ export default function RootLayout({
         <AuthProvider>{children}</AuthProvider>
         <Footer />
         {/* <VideoPopup /> */}
-        <AgeGate />
+        {/* <AgeGate /> */}
       </body>
     </html>
   );
